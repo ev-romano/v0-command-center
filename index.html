@@ -936,8 +936,7 @@ function buildForMerchants(merchants,opts){
           lifecycle_stages:[b.stage],
           customer_states:tactic?tactic.customer_states:["prospective_customer"],
           levers:b.lv,
-          parent_id:String(b.pid),
-          full_reference_text:b.orig
+          parent_id:String(b.pid)
         }
       };
     });
