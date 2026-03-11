@@ -742,7 +742,7 @@ function renderV0(){
     <td><span class="badge ${mc2[t.merchant]||''}">${t.merchant}</span></td>
     <td><span class="badge ${t.status==='new'?'tg':'tm'}">${t.status}</span></td>
     <td class="text-xs">${t.description}</td>
-    <td class="text-[11px] text-gh max-w-xs">${t.prompt}</td>
+    <td class="text-[11px] text-gh max-w-lg">${t.prompt}</td>
     <td class="text-[11px] text-gh">${t.examples.join(', ')}</td>
     <td class="font-mono text-xs text-gh">${t.required_properties.length?t.required_properties.join(', '):'[]'}</td>
     <td class="font-mono text-center">${t.urgency}</td>
