@@ -212,7 +212,7 @@ textarea:focus{outline:none;border-color:var(--ac)}
     </div>
   </div>
   <div class="cd overflow-auto" style="max-height:calc(100vh - 100px)"><table>
-    <thead><tr><th>id</th><th>merchant</th><th>stage</th><th>slot</th><th>tactic</th><th>template_text (templatized)</th><th>original (CSV)</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th><th>merge_tags</th><th>llm_tags</th></tr></thead>
+    <thead><tr><th>id</th><th>parent_id</th><th>merchant</th><th>stage</th><th>slot</th><th>tactic</th><th>template_text (templatized)</th><th>original (CSV)</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th><th>merge_tags</th><th>llm_tags</th></tr></thead>
     <tbody id="v0-bp-body"></tbody>
   </table></div>
 </div>
@@ -771,6 +771,7 @@ function renderBPTable(){
     const fullId=bpIds?bpIds.id:'not pinned';
     return `<tr class="${sc[b.stage]||''}">
     <td class="font-mono text-[10px] text-gh whitespace-nowrap cursor-help" title="${fullId}">${shortId}</td>
+    <td class="font-mono text-center text-xs">${b.pid}</td>
     <td><span class="badge ${mc[b.m]||''}">${b.m}</span></td>
     <td><span class="badge ${stc[b.stage]||''}">${b.stage}</span></td>
     <td class="font-mono text-center">${b.slot}</td>
@@ -922,6 +923,7 @@ function buildForMerchants(merchants,opts){
         id:bpIds.id,
         version_group_id:bpIds.vgId,
         tactic_id:tid,
+        parent_id:b.pid,
         template_text:b.tmpl,
         eligibility:[],
         metadata:{urgency:b.u,discount:b.d,conversational:b.c,brand_focus:b.b,levers:b.lv}
