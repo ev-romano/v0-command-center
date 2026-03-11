@@ -100,7 +100,7 @@ textarea:focus{outline:none;border-color:var(--ac)}
     <div class="font-mono text-[9px] text-gh/50 px-2 pt-3 pb-1 tracking-widest">V0 BUILD</div>
     <button onclick="nav('v0-tactics')" data-p="v0-tactics" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">New Tactics</button>
     <button onclick="nav('v0-blueprints')" data-p="v0-blueprints" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">New Blueprints</button>
-    <button onclick="nav('v0-llm')" data-p="v0-llm" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">LLM Tags (10)</button>
+    <button onclick="nav('v0-llm')" data-p="v0-llm" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">LLM Tags (19)</button>
     <div class="font-mono text-[9px] text-gh/50 px-2 pt-3 pb-1 tracking-widest">INPUTS</div>
     <button onclick="nav('inputs-enums')" data-p="inputs-enums" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Enums & Taxonomy</button>
     <button onclick="nav('inputs-hooks')" data-p="inputs-hooks" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Hooks (99)</button>
@@ -223,9 +223,9 @@ textarea:focus{outline:none;border-color:var(--ac)}
     <h1 class="font-bold text-lg text-white">LLM Tags (V0)</h1>
     <span class="badge tg">V0 BUILD</span>
   </div>
-  <p class="text-xs text-gh mb-4">Complete LLM variable registry for v0. 9 existing in MAI + 1 new gap tag.</p>
+  <p class="text-xs text-gh mb-4">Per-merchant LLM tags with brand-specific examples. 10 unique keys × per-merchant = 19 tag records (Rhoback: 10, Wyze: 9).</p>
   <div class="cd overflow-auto"><table>
-    <thead><tr><th>key</th><th>status</th><th>description</th><th>prompt</th><th>examples</th><th>required_properties</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th></tr></thead>
+    <thead><tr><th>key</th><th>merchant</th><th>status</th><th>description</th><th>prompt</th><th>examples</th><th>required_properties</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th></tr></thead>
     <tbody id="v0-llm-body"></tbody>
   </table></div>
 </div>
@@ -371,7 +371,7 @@ textarea:focus{outline:none;border-color:var(--ac)}
         <div class="space-y-1.5">
           <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="ex-tactics" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">Tactics</span> <span class="font-mono text-[10px] text-gh">(welcome_sequence)</span></label>
           <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="ex-blueprints" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">Blueprints</span></label>
-          <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="ex-llm" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">LLM Tags</span> <span class="font-mono text-[10px] text-gh">(10 tags: 9 existing + 1 new)</span></label>
+          <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="ex-llm" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">LLM Tags</span> <span class="font-mono text-[10px] text-gh">(per-merchant, 19 total)</span></label>
         </div>
       </div>
       <!-- Output mode -->
@@ -508,16 +508,33 @@ const V0_TACTICS=[
 ];
 
 const V0_NEW_LLM=[
-  {key:"browsed_product_colloquial_name",description:"Informal name of a product the subscriber recently browsed.",prompt:"You are given the subscriber's recent browse history. Pick the most relevant product and return a casual, conversational name for it. Do not use the exact catalog title — make it sound natural in a text message. Do not include a leading article or determiner (no 'the', 'that', 'those', 'our'). Start with the product noun.",examples:["polos you were checking out","hoodie you were looking at"],required_properties:["browsed_products"],urgency:2,discount:1,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
-  {key:"browsed_product_colloquial_category",description:"Casual category or type of product the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Determine the general category or type of the most relevant browsed product and return it in casual language (e.g. 'polos', 'hoodies', 'running shoes'). Return only the category name.",examples:["polos","hoodies","running shoes"],required_properties:["browsed_products"],urgency:1,discount:1,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
-  {key:"browsed_product_url",description:"URL to the specific product page the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Select the URL for the most relevant product the subscriber browsed. Return only the URL.",examples:["https://example.com/products/performance-polo","https://example.com/products/fleece-hoodie"],required_properties:["browsed_products"],urgency:2,discount:1,conversational:1,brand_focus:2,levers:["personalization"],status:"exists"},
-  {key:"popular_product_name",description:"Name of a top-selling or popular product selected by the LLM.",prompt:"You are given the brand's bestseller products. Pick the single most compelling product to feature by name. Return only the product name in a casual, customer-friendly way. Do not include a leading article or determiner (no 'the', 'that', 'our'). Start with the product name.",examples:["Trail Runner Pro","Classic Fleece Hoodie"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:4,brand_focus:3,levers:["personalization"],status:"exists"},
-  {key:"popular_product_review_count",description:"Estimated review count for a featured popular product.",prompt:"You are given the brand's bestseller products. Estimate a compelling review count for the featured popular product. Return only a count string like '2,400+' or '500+'.",examples:["2,400+","500+","1,200+"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:3,brand_focus:3,levers:["social_proof"],status:"exists"},
-  {key:"popular_collection_url",description:"Collection page URL for the featured popular product.",prompt:"You are given the brand's bestseller products. Select the collection or product page URL that best matches the featured popular product. Return only the URL.",examples:["https://example.com/collections/running","https://example.com/products/trail-runner-pro"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:1,brand_focus:3,levers:["personalization"],status:"exists"},
-  {key:"new_offer_code",description:"Discount code selected by the LLM from available strategic offers.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate discount code to offer this subscriber. Return only the discount code string exactly as provided.",examples:["SAVE20","WELCOME15"],required_properties:["strategic_offers"],urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"],status:"exists"},
-  {key:"new_offer_amount",description:"Discount amount corresponding to the selected offer code.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate offer and return its discount amount with units (e.g. '20%' or '$10 off'). Return only the amount string.",examples:["20%","$10 off","15% off"],required_properties:["strategic_offers"],urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"],status:"exists"},
-  {key:"product_in_cart_colloquial_name",description:"Casual name for a product in the subscriber's cart.",prompt:"You are given the subscriber's cart contents. Pick the most relevant product and return a casual, conversational name for it that sounds natural in a text message. Do not use the exact catalog title. Do not include a leading article or determiner (no 'the', 'that', 'those', 'our'). Start with the product noun.",examples:["polo you added","hoodie in your cart"],required_properties:["cart_products"],urgency:3,discount:2,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
-  {key:"product_in_cart_colloquial_category",description:"Casual category or type of product in the subscriber's cart.",prompt:"You are given the subscriber's cart contents. Determine the general category or type of the most relevant cart product and return it in singular casual language (e.g. 'security camera', 'smart plug', 'polo'). Return only the singular category name.",examples:["security camera","smart plug","hoodie"],required_properties:["cart_products"],urgency:3,discount:2,conversational:5,brand_focus:2,levers:["personalization"],status:"new"}
+  // ── browsed_product_colloquial_name (SHARED → split) ──
+  {key:"browsed_product_colloquial_name",merchant:"rhoback",description:"Informal name of a product the subscriber recently browsed.",prompt:"You are given the subscriber's recent browse history. Pick the most relevant product and return a casual, conversational name for it. Do not use the exact catalog title — make it sound natural in a text message. Do not include a leading article or determiner (no 'the', 'that', 'those', 'our'). Start with the product noun.",examples:["performance polos you were checking out","quarter-zip you were looking at"],required_properties:["browsed_products"],urgency:2,discount:1,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
+  {key:"browsed_product_colloquial_name",merchant:"wyze",description:"Informal name of a product the subscriber recently browsed.",prompt:"You are given the subscriber's recent browse history. Pick the most relevant product and return a casual, conversational name for it. Do not use the exact catalog title — make it sound natural in a text message. Do not include a leading article or determiner (no 'the', 'that', 'those', 'our'). Start with the product noun.",examples:["security camera you were checking out","video doorbell you were looking at"],required_properties:["browsed_products"],urgency:2,discount:1,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
+  // ── browsed_product_colloquial_category (SHARED → split) ──
+  {key:"browsed_product_colloquial_category",merchant:"rhoback",description:"Casual category or type of product the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Determine the general category or type of the most relevant browsed product and return it in casual language (e.g. 'polos', 'hoodies', 'quarter-zips'). Return only the category name.",examples:["polos","hoodies","quarter-zips"],required_properties:["browsed_products"],urgency:1,discount:1,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
+  {key:"browsed_product_colloquial_category",merchant:"wyze",description:"Casual category or type of product the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Determine the general category or type of the most relevant browsed product and return it in casual language (e.g. 'security cameras', 'smart plugs', 'video doorbells'). Return only the category name.",examples:["security cameras","smart plugs","video doorbells"],required_properties:["browsed_products"],urgency:1,discount:1,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
+  // ── browsed_product_url (SHARED → split) ──
+  {key:"browsed_product_url",merchant:"rhoback",description:"URL to the specific product page the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Select the URL for the most relevant product the subscriber browsed. Return only the URL.",examples:["https://rhoback.com/products/hesi-performance-hoodie","https://rhoback.com/products/original-performance-polo"],required_properties:["browsed_products"],urgency:2,discount:1,conversational:1,brand_focus:2,levers:["personalization"],status:"exists"},
+  {key:"browsed_product_url",merchant:"wyze",description:"URL to the specific product page the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Select the URL for the most relevant product the subscriber browsed. Return only the URL.",examples:["https://wyze.com/wyze-cam.html","https://wyze.com/wyze-video-doorbell-pro.html"],required_properties:["browsed_products"],urgency:2,discount:1,conversational:1,brand_focus:2,levers:["personalization"],status:"exists"},
+  // ── popular_product_name (RHOBACK ONLY) ──
+  {key:"popular_product_name",merchant:"rhoback",description:"Name of a top-selling or popular product selected by the LLM.",prompt:"You are given the brand's bestseller products. Pick the single most compelling product to feature by name. Return only the product name in a casual, customer-friendly way. Do not include a leading article or determiner (no 'the', 'that', 'our'). Start with the product name.",examples:["Hesi Performance Hoodie","Original Performance Polo"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:4,brand_focus:3,levers:["personalization"],status:"exists"},
+  // ── popular_product_review_count (RHOBACK ONLY) ──
+  {key:"popular_product_review_count",merchant:"rhoback",description:"Estimated review count for a featured popular product.",prompt:"You are given the brand's bestseller products. Estimate a compelling review count for the featured popular product. Return only a count string like '2,400+' or '500+'.",examples:["6,000+","2,400+","1,200+"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:3,brand_focus:3,levers:["social_proof"],status:"exists"},
+  // ── popular_collection_url (SHARED → split) ──
+  {key:"popular_collection_url",merchant:"rhoback",description:"Collection page URL for the featured popular product.",prompt:"You are given the brand's bestseller products. Select the collection or product page URL that best matches the featured popular product. Return only the URL.",examples:["https://rhoback.com/collections/mens-tops-hesi-performance-hoodies","https://rhoback.com/collections/mens-polos"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:1,brand_focus:3,levers:["personalization"],status:"exists"},
+  {key:"popular_collection_url",merchant:"wyze",description:"Collection page URL for the featured popular product.",prompt:"You are given the brand's bestseller products. Select the collection or product page URL that best matches the featured popular product. Return only the URL.",examples:["https://wyze.com/cameras","https://wyze.com/smart-home"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:1,brand_focus:3,levers:["personalization"],status:"exists"},
+  // ── new_offer_code (NOT IN BLUEPRINTS — kept per-merchant for completeness) ──
+  {key:"new_offer_code",merchant:"rhoback",description:"Discount code selected by the LLM from available strategic offers.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate discount code to offer this subscriber. Return only the discount code string exactly as provided.",examples:["WELCOME15","RHOBACK20"],required_properties:["strategic_offers"],urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"],status:"exists"},
+  {key:"new_offer_code",merchant:"wyze",description:"Discount code selected by the LLM from available strategic offers.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate discount code to offer this subscriber. Return only the discount code string exactly as provided.",examples:["WELCOME20","WYZE15"],required_properties:["strategic_offers"],urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"],status:"exists"},
+  // ── new_offer_amount (NOT IN BLUEPRINTS — kept per-merchant for completeness) ──
+  {key:"new_offer_amount",merchant:"rhoback",description:"Discount amount corresponding to the selected offer code.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate offer and return its discount amount with units (e.g. '20%' or '$10 off'). Return only the amount string.",examples:["15%","20%"],required_properties:["strategic_offers"],urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"],status:"exists"},
+  {key:"new_offer_amount",merchant:"wyze",description:"Discount amount corresponding to the selected offer code.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate offer and return its discount amount with units (e.g. '20%' or '$10 off'). Return only the amount string.",examples:["20%","15%"],required_properties:["strategic_offers"],urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"],status:"exists"},
+  // ── product_in_cart_colloquial_name (SHARED → split) ──
+  {key:"product_in_cart_colloquial_name",merchant:"rhoback",description:"Casual name for a product in the subscriber's cart.",prompt:"You are given the subscriber's cart contents. Pick the most relevant product and return a casual, conversational name for it that sounds natural in a text message. Do not use the exact catalog title. Do not include a leading article or determiner (no 'the', 'that', 'those', 'our'). Start with the product noun.",examples:["performance polo you added","quarter-zip in your cart"],required_properties:["cart_products"],urgency:3,discount:2,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
+  {key:"product_in_cart_colloquial_name",merchant:"wyze",description:"Casual name for a product in the subscriber's cart.",prompt:"You are given the subscriber's cart contents. Pick the most relevant product and return a casual, conversational name for it that sounds natural in a text message. Do not use the exact catalog title. Do not include a leading article or determiner (no 'the', 'that', 'those', 'our'). Start with the product noun.",examples:["security camera you added","video doorbell in your cart"],required_properties:["cart_products"],urgency:3,discount:2,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
+  // ── product_in_cart_colloquial_category (WYZE ONLY) ──
+  {key:"product_in_cart_colloquial_category",merchant:"wyze",description:"Casual category or type of product in the subscriber's cart.",prompt:"You are given the subscriber's cart contents. Determine the general category or type of the most relevant cart product and return it in singular casual language (e.g. 'security camera', 'smart plug', 'video doorbell'). Return only the singular category name.",examples:["security camera","smart plug","video doorbell"],required_properties:["cart_products"],urgency:3,discount:2,conversational:5,brand_focus:2,levers:["personalization"],status:"new"}
 ];
 
 const V0_BLUEPRINTS=[
@@ -714,8 +731,15 @@ function renderV0(){
   </tr>`).join('');
 
   // New LLM Tags
-  document.getElementById('v0-llm-body').innerHTML=V0_NEW_LLM.map(t=>`<tr>
-    <td class="font-mono text-xs text-white whitespace-nowrap">${t.key}</td>
+  const mc2={rhoback:'bg-emerald-500/8 text-emerald-400',wyze:'bg-yellow-500/8 text-yellow-400'};
+  document.getElementById('v0-llm-body').innerHTML=V0_NEW_LLM.map(t=>{
+    const idKey=`${t.merchant}:${t.key}`;
+    const ids=DELIVERED_LLM_IDS[idKey];
+    const shortId=ids?ids.id.split('-')[0]+'…':'—';
+    const fullId=ids?ids.id:'not pinned';
+    return `<tr>
+    <td class="font-mono text-xs text-white whitespace-nowrap cursor-help" title="${fullId}">${t.key} <span class="text-gh/40 text-[9px]">${shortId}</span></td>
+    <td><span class="badge ${mc2[t.merchant]||''}">${t.merchant}</span></td>
     <td><span class="badge ${t.status==='new'?'tg':'tm'}">${t.status}</span></td>
     <td class="text-xs">${t.description}</td>
     <td class="text-[11px] text-gh max-w-xs">${t.prompt}</td>
@@ -726,7 +750,7 @@ function renderV0(){
     <td class="font-mono text-center">${t.conversational}</td>
     <td class="font-mono text-center">${t.brand_focus}</td>
     <td>${badges(t.levers,'tl')}</td>
-  </tr>`).join('');
+  </tr>`}).join('');
 
   renderBPTable();
 }
@@ -801,16 +825,25 @@ const DELIVERED_TACTIC_IDS={
 };
 
 const DELIVERED_LLM_IDS={
-  "browsed_product_colloquial_name":{id:"d521c30b-46b8-4b41-aee0-63f1cd330d53",vgId:"890ddbe9-17d1-44d0-b13d-38e34934b444"},
-  "browsed_product_colloquial_category":{id:"49dad1ea-a18d-40f3-a718-d818c411335f",vgId:"d4fd27f8-6dff-4f62-83ae-3fc2933d5ac2"},
-  "browsed_product_url":{id:"6bb188d0-b7be-45a9-892f-1a0e62848344",vgId:"e0e4087d-d355-4c16-84c5-5fc4786d280f"},
-  "popular_product_name":{id:"ba2cc3a4-5825-4651-9be6-25bbdafca64c",vgId:"247d9ca6-b366-4c5a-9a4d-0e9a6c13128f"},
-  "popular_product_review_count":{id:"fdb0bda7-32ab-429a-9d82-a18e6056b666",vgId:"bf4ed19f-48e4-40ec-a24f-198f871cda1e"},
-  "popular_collection_url":{id:"592732d1-064c-40e9-a1f1-4b1cc8c4bc69",vgId:"aba2a0f1-3458-4cfd-9f76-2b944c4ded59"},
-  "new_offer_code":{id:"f83c7483-971b-4df7-baf0-cc1f1a9d54ea",vgId:"fc67a928-d7b1-4c24-bed0-ac8531c5470c"},
-  "new_offer_amount":{id:"27dc466c-f80f-4cc5-8829-af635eb2a202",vgId:"35b8eff1-4ec6-47fa-91a2-edc9a8c4c06c"},
-  "product_in_cart_colloquial_name":{id:"807a5629-16cf-450b-a735-b6f80e5ce8cf",vgId:"10235f51-5ee5-479e-8931-cfcfca65ebfa"},
-  "product_in_cart_colloquial_category":{id:"0df68be3-c007-4cd2-a57b-971a17a9f8c2",vgId:"20395137-5752-4d26-8b5c-a0cb1c7e8430"}
+  // Rhoback (delivered to Chase — do not change)
+  "rhoback:browsed_product_colloquial_name":{id:"d521c30b-46b8-4b41-aee0-63f1cd330d53",vgId:"890ddbe9-17d1-44d0-b13d-38e34934b444"},
+  "rhoback:browsed_product_colloquial_category":{id:"49dad1ea-a18d-40f3-a718-d818c411335f",vgId:"d4fd27f8-6dff-4f62-83ae-3fc2933d5ac2"},
+  "rhoback:browsed_product_url":{id:"6bb188d0-b7be-45a9-892f-1a0e62848344",vgId:"e0e4087d-d355-4c16-84c5-5fc4786d280f"},
+  "rhoback:popular_product_name":{id:"ba2cc3a4-5825-4651-9be6-25bbdafca64c",vgId:"247d9ca6-b366-4c5a-9a4d-0e9a6c13128f"},
+  "rhoback:popular_product_review_count":{id:"fdb0bda7-32ab-429a-9d82-a18e6056b666",vgId:"bf4ed19f-48e4-40ec-a24f-198f871cda1e"},
+  "rhoback:popular_collection_url":{id:"592732d1-064c-40e9-a1f1-4b1cc8c4bc69",vgId:"aba2a0f1-3458-4cfd-9f76-2b944c4ded59"},
+  "rhoback:new_offer_code":{id:"f83c7483-971b-4df7-baf0-cc1f1a9d54ea",vgId:"fc67a928-d7b1-4c24-bed0-ac8531c5470c"},
+  "rhoback:new_offer_amount":{id:"27dc466c-f80f-4cc5-8829-af635eb2a202",vgId:"35b8eff1-4ec6-47fa-91a2-edc9a8c4c06c"},
+  "rhoback:product_in_cart_colloquial_name":{id:"807a5629-16cf-450b-a735-b6f80e5ce8cf",vgId:"10235f51-5ee5-479e-8931-cfcfca65ebfa"},
+  // Wyze (new — not yet delivered)
+  "wyze:browsed_product_colloquial_name":{id:"b0fe3133-e74a-47ed-bbcc-7e4ca8615f44",vgId:"ce03f757-debf-4a99-bad3-bf5f6fbecf5b"},
+  "wyze:browsed_product_colloquial_category":{id:"a6eb21d1-9f2a-42f4-bc86-80edcc7fa271",vgId:"11c547a4-49c0-44fe-89a4-8851992e8fd3"},
+  "wyze:browsed_product_url":{id:"6d1b7beb-0954-432b-93f1-78f58b581a1a",vgId:"65b188b1-d017-4940-8261-5891f5e6e1f0"},
+  "wyze:popular_collection_url":{id:"c838f90b-03ba-4be7-a0d7-0d0cd860f609",vgId:"f2023a9d-d1f8-486f-b39e-e59d4393afb1"},
+  "wyze:product_in_cart_colloquial_name":{id:"938840ac-49c9-40eb-9035-0da78055d50f",vgId:"a373b9de-a012-4196-83b0-ffc5182d9836"},
+  "wyze:product_in_cart_colloquial_category":{id:"0df68be3-c007-4cd2-a57b-971a17a9f8c2",vgId:"20395137-5752-4d26-8b5c-a0cb1c7e8430"},
+  "wyze:new_offer_code":{id:"7af9fcba-80c7-41db-a613-6cb06363c5dc",vgId:"c9ef3da6-b83c-4820-b952-96a49b8dc777"},
+  "wyze:new_offer_amount":{id:"7feb4d8a-7e88-4aff-b285-f2b0b93f73b2",vgId:"a2d4e961-da27-4083-b374-6b6d328d804f"}
 };
 
 // Rhoback blueprint IDs keyed by "stage-slot"
@@ -897,8 +930,10 @@ function buildForMerchants(merchants,opts){
   } else { result.blueprints=[]; }
 
   if(opts.llm){
-    result.llm_tags=V0_NEW_LLM.map(t=>{
-      const ids=DELIVERED_LLM_IDS[t.key]||{id:uuid(`llm-${t.key}`),vgId:uuid(`llm-vg-${t.key}`)};
+    const mTags=V0_NEW_LLM.filter(t=>merchants.includes(t.merchant));
+    result.llm_tags=mTags.map(t=>{
+      const idKey=`${t.merchant}:${t.key}`;
+      const ids=DELIVERED_LLM_IDS[idKey]||{id:uuid(`llm-${idKey}`),vgId:uuid(`llm-vg-${idKey}`)};
       return {
         id:ids.id,version_group_id:ids.vgId,
         key:t.key,description:t.description,prompt:t.prompt,
@@ -935,7 +970,10 @@ function renderExport(){
     const ct=V0_BLUEPRINTS.filter(b=>merchants.includes(b.m)).length;
     parts.push(ct+' blueprints');
   }
-  if(opts.llm) parts.push(V0_NEW_LLM.length+' llm_tag(s)');
+  if(opts.llm){
+    const llmCt=V0_NEW_LLM.filter(t=>merchants.includes(t.merchant)).length;
+    parts.push(llmCt+' llm_tag(s)');
+  }
   const merchLabel=merchants.join(' + ');
   document.getElementById('ex-summary').textContent=parts.length?`${merchLabel}: ${parts.join(', ')}`:'Nothing selected.';
 
