@@ -403,7 +403,7 @@ function toggleTheme(){
   document.getElementById('theme-btn').textContent=isLight?'light':'dark';
   localStorage.setItem('v0-theme',isLight?'light':'dark');
 }
-(function(){const t=localStorage.getItem('v0-theme');if(t==='light'){document.body.classList.add('light');document.addEventListener('DOMContentLoaded',()=>{document.getElementById('theme-btn').textContent='light'})}})();
+(function(){const t=localStorage.getItem('v0-theme');if(t!=='dark'){document.body.classList.add('light');document.addEventListener('DOMContentLoaded',()=>{document.getElementById('theme-btn').textContent='light'})}})();
 
 // ========== LIVE PROD DATA (from API) ==========
 const PROD_TACTICS=[
