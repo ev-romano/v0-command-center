@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>v0 Blueprint Launch — Command Center</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script>
+tailwind.config={darkMode:'class',theme:{extend:{colors:{s0:'#0a0a0f',s1:'#12121a',s2:'#1a1a25',s3:'#222230',s4:'#2a2a3a',ac:'#22d3ee',acD:'#0e7490',acB:'#67e8f9',w:'#f59e0b',g:'#10b981',r:'#ef4444',gh:'#64748b'},fontFamily:{mono:['JetBrains Mono','monospace'],body:['IBM Plex Sans','sans-serif']}}}}
+</script>
+<style>
+:root{
+  --bg0:#0a0a0f;--bg1:#12121a;--bg2:#1a1a25;--bg3:#222230;--bg4:#2a2a3a;
+  --fg:#cbd5e1;--fg2:#e2e8f0;--fg3:#94a3b8;--fgm:#64748b;--fgd:#64748b40;
+  --ac:#22d3ee;--acL:#67e8f9;--acBg:rgba(34,211,238,.12);--acBg2:rgba(34,211,238,.07);--acBg3:rgba(34,211,238,.03);--acBd:rgba(34,211,238,.2);--acBd2:rgba(34,211,238,.3);
+  --white:#fff;
+  --tm-bg:rgba(34,211,238,.12);--tm-fg:#67e8f9;--tm-bd:rgba(34,211,238,.2);
+  --tl-bg:rgba(168,85,247,.12);--tl-fg:#c084fc;--tl-bd:rgba(168,85,247,.2);
+  --tg-bg:rgba(245,158,11,.12);--tg-fg:#fbbf24;--tg-bd:rgba(245,158,11,.2);
+  --tp-bg:rgba(16,185,129,.12);--tp-fg:#34d399;--tp-bd:rgba(16,185,129,.2);
+  --tn-bg:rgba(99,102,241,.12);--tn-fg:#a5b4fc;--tn-bd:rgba(99,102,241,.2);
+}
+.light{
+  --bg0:#f8fafc;--bg1:#f1f5f9;--bg2:#e2e8f0;--bg3:#cbd5e1;--bg4:#94a3b8;
+  --fg:#1e293b;--fg2:#0f172a;--fg3:#475569;--fgm:#64748b;--fgd:#94a3b840;
+  --ac:#0891b2;--acL:#0e7490;--acBg:rgba(8,145,178,.1);--acBg2:rgba(8,145,178,.06);--acBg3:rgba(8,145,178,.03);--acBd:rgba(8,145,178,.25);--acBd2:rgba(8,145,178,.35);
+  --white:#0f172a;
+  --tm-bg:rgba(8,145,178,.1);--tm-fg:#0e7490;--tm-bd:rgba(8,145,178,.25);
+  --tl-bg:rgba(147,51,234,.1);--tl-fg:#7c3aed;--tl-bd:rgba(147,51,234,.25);
+  --tg-bg:rgba(217,119,6,.1);--tg-fg:#b45309;--tg-bd:rgba(217,119,6,.25);
+  --tp-bg:rgba(5,150,105,.1);--tp-fg:#047857;--tp-bd:rgba(5,150,105,.25);
+  --tn-bg:rgba(79,70,229,.1);--tn-fg:#4338ca;--tn-bd:rgba(79,70,229,.25);
+}
+*{scrollbar-width:thin;scrollbar-color:var(--bg4) var(--bg1)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:var(--bg1)}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px}
+body{background:var(--bg0);color:var(--fg);font-family:'IBM Plex Sans',sans-serif;transition:background .2s,color .2s}
+.page{display:none}.page.active{display:block}
+.nav-item{transition:all .12s}.nav-item:hover{background:var(--acBg2)}
+.nav-item.active{background:var(--acBg);border-left-color:var(--ac);color:var(--fg2)}
+.cd{background:var(--bg1);border:1px solid var(--bg3);border-radius:6px}
+.tm{background:var(--tm-bg);color:var(--tm-fg);border:1px solid var(--tm-bd)}
+.tl{background:var(--tl-bg);color:var(--tl-fg);border:1px solid var(--tl-bd)}
+.tg{background:var(--tg-bg);color:var(--tg-fg);border:1px solid var(--tg-bd)}
+.tp{background:var(--tp-bg);color:var(--tp-fg);border:1px solid var(--tp-bd)}
+.tn{background:var(--tn-bg);color:var(--tn-fg);border:1px solid var(--tn-bd)}
+table{border-collapse:collapse;width:100%}
+th{text-align:left;padding:8px 12px;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--fgm);border-bottom:1px solid var(--bg3);white-space:nowrap;position:sticky;top:0;background:var(--bg2);z-index:1}
+td{padding:7px 12px;font-size:12px;border-bottom:1px solid var(--bg2);vertical-align:top}
+tr:hover td{background:var(--acBg3)}
+.hm{color:var(--tm-fg);font-weight:500}.hl{color:var(--tl-fg);font-weight:500}
+.fb{cursor:pointer;font-size:11px;font-family:'JetBrains Mono',monospace;padding:4px 10px;border-radius:4px;border:1px solid var(--bg3);background:var(--bg2);color:var(--fg3);transition:all .12s}
+.fb:hover{border-color:var(--bg4);color:var(--fg2)}.fb.on{background:var(--acBg);color:var(--ac);border-color:var(--acBd2)}
+.badge{font-size:10px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border-radius:3px;white-space:nowrap}
+.json-out{background:var(--bg0);border:1px solid var(--bg3);border-radius:6px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--fg3);white-space:pre-wrap;word-break:break-all;max-height:600px;overflow:auto}
+.tab{cursor:pointer;padding:8px 16px;font-size:12px;color:var(--fgm);border-bottom:2px solid transparent;transition:all .12s;white-space:nowrap}
+.tab:hover{color:var(--fg3)}.tab.on{color:var(--ac);border-bottom-color:var(--ac)}
+.copy-btn{cursor:pointer;font-size:10px;padding:3px 8px;border-radius:3px;background:var(--bg2);border:1px solid var(--bg3);color:var(--fgm);transition:all .12s}
+.copy-btn:hover{border-color:var(--ac);color:var(--ac)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fade{animation:fadeIn .2s ease forwards}
+input[type="number"]{background:var(--bg0);border:1px solid var(--bg3);border-radius:3px;padding:2px 4px;width:40px;text-align:center;color:var(--fg2);font-family:'JetBrains Mono',monospace;font-size:11px}
+input[type="number"]:focus{outline:none;border-color:var(--ac)}
+select{background:var(--bg0);border:1px solid var(--bg3);border-radius:3px;padding:2px 6px;color:var(--fg2);font-family:'JetBrains Mono',monospace;font-size:11px}
+select:focus{outline:none;border-color:var(--ac)}
+textarea{background:var(--bg0);border:1px solid var(--bg3);border-radius:4px;padding:6px 8px;color:var(--fg2);font-family:'JetBrains Mono',monospace;font-size:11px;resize:vertical;width:100%}
+textarea:focus{outline:none;border-color:var(--ac)}
+.theme-toggle{cursor:pointer;padding:4px 8px;border-radius:4px;border:1px solid var(--bg3);background:var(--bg2);color:var(--fgm);font-size:10px;font-family:'JetBrains Mono',monospace;transition:all .12s}
+.theme-toggle:hover{border-color:var(--ac);color:var(--ac)}
+/* Light mode overrides for Tailwind-classed elements */
+.light nav{background:var(--bg1)!important;border-color:var(--bg3)!important}
+.light .border-s3{border-color:var(--bg3)!important}
+.light .bg-s1{background:var(--bg1)!important}
+.light .bg-s2{background:var(--bg2)!important}
+.light .text-white{color:var(--white)!important}
+.light .text-gh{color:var(--fgm)!important}
+.light .text-gray-300{color:var(--fg)!important}
+.light .text-gray-400{color:var(--fg3)!important}
+.light .accent-cyan-500{accent-color:var(--ac)}
+.light .json-out{background:var(--bg1)}
+.light pre{color:var(--fg3)}
+</style>
+</head>
+<body class="min-h-screen flex">
+
+<nav class="w-48 bg-s1 border-r border-s3 flex flex-col fixed h-full z-10">
+  <div class="p-3 border-b border-s3">
+    <div class="font-bold text-sm text-white tracking-wide">v0 LAUNCH</div>
+    <div class="font-mono text-[9px] text-gh mt-0.5 tracking-widest">COMMAND CENTER</div>
+  </div>
+  <div class="flex-1 py-1.5 px-1.5 space-y-0.5">
+    <div class="font-mono text-[9px] text-gh/50 px-2 pt-2 pb-1 tracking-widest">INVENTORY</div>
+    <button onclick="nav('today-tactics')" data-p="today-tactics" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Tactics</button>
+    <button onclick="nav('today-blueprints')" data-p="today-blueprints" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Blueprints</button>
+    <button onclick="nav('today-llm')" data-p="today-llm" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">LLM Tags</button>
+    <button onclick="nav('today-merge')" data-p="today-merge" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Merge Tags</button>
+    <button onclick="nav('today-props')" data-p="today-props" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Properties</button>
+    <div class="font-mono text-[9px] text-gh/50 px-2 pt-3 pb-1 tracking-widest">V0 BUILD</div>
+    <button onclick="nav('v0-tactics')" data-p="v0-tactics" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">New Tactics</button>
+    <button onclick="nav('v0-blueprints')" data-p="v0-blueprints" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">New Blueprints</button>
+    <button onclick="nav('v0-llm')" data-p="v0-llm" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">LLM Tags (10)</button>
+    <div class="font-mono text-[9px] text-gh/50 px-2 pt-3 pb-1 tracking-widest">INPUTS</div>
+    <button onclick="nav('inputs-enums')" data-p="inputs-enums" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Enums & Taxonomy</button>
+    <button onclick="nav('inputs-hooks')" data-p="inputs-hooks" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Hooks (99)</button>
+    <button onclick="nav('inputs-ctas')" data-p="inputs-ctas" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">CTAs (80)</button>
+    <div class="font-mono text-[9px] text-gh/50 px-2 pt-3 pb-1 tracking-widest">EXPORT</div>
+    <button onclick="nav('export')" data-p="export" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Generate JSON</button>
+  </div>
+  <div class="p-2.5 border-t border-s3 flex items-center justify-between">
+    <div class="font-mono text-[9px] text-gh/40">marketing-ai</div>
+    <button onclick="toggleTheme()" class="theme-toggle" id="theme-btn" title="Toggle light/dark mode">dark</button>
+  </div>
+</nav>
+
+<main class="ml-48 flex-1 min-h-screen">
+
+<!-- ============ TODAY: TACTICS ============ -->
+<div id="page-today-tactics" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">Tactics</h1>
+    <span class="badge tp">LIVE IN PROD</span>
+    <span class="font-mono text-xs text-gh ml-auto">2 tactics</span>
+  </div>
+  <div class="cd overflow-auto"><table>
+    <thead><tr><th>name</th><th>display_name</th><th>message_type</th><th>group</th><th>lifecycle_stages</th><th>customer_states</th><th>blueprints</th><th>id</th></tr></thead>
+    <tbody id="t-tactics"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ TODAY: BLUEPRINTS ============ -->
+<div id="page-today-blueprints" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">Blueprints</h1>
+    <span class="badge tp">LIVE IN PROD</span>
+    <span class="font-mono text-xs text-gh ml-auto">6 blueprints</span>
+  </div>
+  <div class="cd overflow-auto" style="max-height:calc(100vh - 100px)"><table>
+    <thead><tr><th>tactic</th><th>template_text</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th><th>id</th></tr></thead>
+    <tbody id="t-blueprints"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ TODAY: LLM TAGS ============ -->
+<div id="page-today-llm" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">LLM Tags</h1>
+    <span class="badge tp">LIVE IN PROD</span>
+    <span class="font-mono text-xs text-gh ml-auto">9 tags</span>
+  </div>
+  <div class="cd overflow-auto" style="max-height:calc(100vh - 100px)"><table>
+    <thead><tr><th>key</th><th>description</th><th>prompt</th><th>examples</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th></tr></thead>
+    <tbody id="t-llm"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ TODAY: MERGE TAGS ============ -->
+<div id="page-today-merge" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">Merge Tags</h1>
+    <span class="badge tp">LIVE IN PROD</span>
+    <span class="font-mono text-xs text-gh ml-auto">7 existing + 1 new</span>
+  </div>
+  <div class="cd overflow-auto"><table>
+    <thead><tr><th>key</th><th>syntax</th><th>description</th><th>example</th><th>status</th></tr></thead>
+    <tbody id="t-merge"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ TODAY: PROPERTIES ============ -->
+<div id="page-today-props" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">Properties</h1>
+    <span class="badge tp">LIVE IN PROD</span>
+    <span class="font-mono text-xs text-gh ml-auto">12 existing + 1 new</span>
+  </div>
+  <div class="cd overflow-auto"><table>
+    <thead><tr><th>key</th><th>description</th><th>example</th><th>type</th></tr></thead>
+    <tbody id="t-props"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ V0: NEW TACTICS ============ -->
+<div id="page-v0-tactics" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">New Tactics</h1>
+    <span class="badge tg">V0 BUILD</span>
+  </div>
+  <p class="text-xs text-gh mb-4">Define the tactic(s) that new blueprints will belong to. Edit fields directly.</p>
+  <div class="cd overflow-auto"><table>
+    <thead><tr><th>name</th><th>display_name</th><th>description</th><th>message_type</th><th>group</th><th>lifecycle_stages</th><th>customer_states</th></tr></thead>
+    <tbody id="v0-tactics-body"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ V0: NEW BLUEPRINTS ============ -->
+<div id="page-v0-blueprints" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-3">
+    <h1 class="font-bold text-lg text-white">New Blueprints</h1>
+    <span class="badge tg">V0 BUILD</span>
+    <div class="flex gap-1.5 ml-auto">
+      <button onclick="filterBP('all')" class="fb on" data-f="all">All (26)</button>
+      <button onclick="filterBP('rhoback')" class="fb" data-f="rhoback">Rhoback (11)</button>
+      <button onclick="filterBP('wyze')" class="fb" data-f="wyze">Wyze (15)</button>
+      <span class="border-l border-s3 mx-1"></span>
+      <button onclick="filterStage('all')" class="fb on" data-s="all">All</button>
+      <button onclick="filterStage('interest')" class="fb" data-s="interest">Interest</button>
+      <button onclick="filterStage('consideration')" class="fb" data-s="consideration">Consider.</button>
+      <button onclick="filterStage('conversion')" class="fb" data-s="conversion">Conversion</button>
+    </div>
+  </div>
+  <div class="cd overflow-auto" style="max-height:calc(100vh - 100px)"><table>
+    <thead><tr><th>merchant</th><th>stage</th><th>slot</th><th>tactic</th><th>template_text (templatized)</th><th>original (CSV)</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th><th>merge_tags</th><th>llm_tags</th></tr></thead>
+    <tbody id="v0-bp-body"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ V0: NEW LLM TAGS ============ -->
+<div id="page-v0-llm" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">LLM Tags (V0)</h1>
+    <span class="badge tg">V0 BUILD</span>
+  </div>
+  <p class="text-xs text-gh mb-4">Complete LLM variable registry for v0. 9 existing in MAI + 1 new gap tag.</p>
+  <div class="cd overflow-auto"><table>
+    <thead><tr><th>key</th><th>status</th><th>description</th><th>prompt</th><th>examples</th><th>required_properties</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th></tr></thead>
+    <tbody id="v0-llm-body"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ INPUTS: ENUMS & TAXONOMY ============ -->
+<div id="page-inputs-enums" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">Enums & Taxonomy</h1>
+    <span class="badge" style="background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.2)">INPUTS</span>
+    <span class="font-mono text-xs text-gh ml-auto">Source: SAE data/inputs.json + MAI AutomationsCMSSyncData</span>
+  </div>
+  <p class="text-xs text-gh mb-4">All valid enum values for creating tactics, blueprints, and LLM tags. Agents must pull from these exact values.</p>
+
+  <div class="grid grid-cols-2 gap-4 mb-4">
+    <!-- Message Types -->
+    <div class="cd p-4">
+      <div class="font-mono text-[10px] text-gh tracking-wider mb-3">MESSAGE TYPES <span class="text-gh/50">(TacticMessageType)</span></div>
+      <table><thead><tr><th>value</th><th>description</th></tr></thead><tbody id="enum-msg-types"></tbody></table>
+    </div>
+    <!-- Tactic Groups -->
+    <div class="cd p-4">
+      <div class="font-mono text-[10px] text-gh tracking-wider mb-3">TACTIC GROUPS <span class="text-gh/50">(TacticGroup)</span></div>
+      <table><thead><tr><th>value</th><th>description</th></tr></thead><tbody id="enum-tactic-groups"></tbody></table>
+    </div>
+    <!-- Lifecycle Stages -->
+    <div class="cd p-4">
+      <div class="font-mono text-[10px] text-gh tracking-wider mb-3">LIFECYCLE STAGES <span class="text-gh/50">(LifecycleStageType)</span></div>
+      <table><thead><tr><th>value</th><th>description</th></tr></thead><tbody id="enum-lifecycle"></tbody></table>
+    </div>
+    <!-- Customer States -->
+    <div class="cd p-4">
+      <div class="font-mono text-[10px] text-gh tracking-wider mb-3">CUSTOMER STATES <span class="text-gh/50">(CustomerStateType)</span></div>
+      <table><thead><tr><th>value</th><th>description</th></tr></thead><tbody id="enum-customer-states"></tbody></table>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-2 gap-4">
+    <!-- Psychology Levers -->
+    <div class="cd p-4">
+      <div class="font-mono text-[10px] text-gh tracking-wider mb-3">PSYCHOLOGY LEVERS <span class="text-gh/50">(SAE: 12 levers, MAI LeverType: 4)</span></div>
+      <table><thead><tr><th>name</th><th>abbr</th><th>description</th><th>in MAI?</th></tr></thead><tbody id="enum-levers"></tbody></table>
+    </div>
+    <!-- Slider Dimensions -->
+    <div class="cd p-4">
+      <div class="font-mono text-[10px] text-gh tracking-wider mb-3">SLIDER DIMENSIONS <span class="text-gh/50">(BlueprintMetadata / LLMTagMetadata)</span></div>
+      <table><thead><tr><th>name</th><th>1 (low)</th><th>2 (mid)</th><th>3 (high)</th></tr></thead><tbody id="enum-sliders"></tbody></table>
+      <div class="mt-2 text-[10px] text-gh/50">SAE uses 1-3 scale. MAI uses 1-5. Convert at boundary.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ INPUTS: HOOKS ============ -->
+<div id="page-inputs-hooks" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-3">
+    <h1 class="font-bold text-lg text-white">Hooks</h1>
+    <span class="badge" style="background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.2)">INPUTS</span>
+    <span class="font-mono text-xs text-gh ml-auto" id="hooks-count">99 hooks</span>
+  </div>
+  <p class="text-xs text-gh mb-3">Opening lines/attention-grabbers from SAE. Tagged by Tactic Group + Psychology Lever.</p>
+  <div class="flex gap-1.5 mb-3 flex-wrap">
+    <button onclick="filterHooks('group','all')" class="fb on" data-hg="all">All Groups</button>
+    <button onclick="filterHooks('group','Offer')" class="fb" data-hg="Offer">Offer</button>
+    <button onclick="filterHooks('group','Discovery Question')" class="fb" data-hg="Discovery Question">Discovery Q</button>
+    <button onclick="filterHooks('group','Education')" class="fb" data-hg="Education">Education</button>
+    <button onclick="filterHooks('group','Post-Purchase Care')" class="fb" data-hg="Post-Purchase Care">Post-Purchase</button>
+    <span class="border-l border-s3 mx-1"></span>
+    <button onclick="filterHooks('lever','all')" class="fb on" data-hl="all">All Levers</button>
+    <button onclick="filterHooks('lever','Reciprocity')" class="fb" data-hl="Reciprocity">Reciprocity</button>
+    <button onclick="filterHooks('lever','Loss Aversion')" class="fb" data-hl="Loss Aversion">Loss Aversion</button>
+    <button onclick="filterHooks('lever','Social Proof')" class="fb" data-hl="Social Proof">Social Proof</button>
+    <button onclick="filterHooks('lever','Commitment')" class="fb" data-hl="Commitment">Commitment</button>
+    <button onclick="filterHooks('lever','Scarcity')" class="fb" data-hl="Scarcity">Scarcity</button>
+    <button onclick="filterHooks('lever','Autonomy')" class="fb" data-hl="Autonomy">Autonomy</button>
+    <button onclick="filterHooks('lever','Goal Gradient')" class="fb" data-hl="Goal Gradient">Goal Gradient</button>
+    <button onclick="filterHooks('lever','Endowment')" class="fb" data-hl="Endowment">Endowment</button>
+    <button onclick="filterHooks('lever','Anchoring')" class="fb" data-hl="Anchoring">Anchoring</button>
+    <button onclick="filterHooks('lever','Status Quo')" class="fb" data-hl="Status Quo">Status Quo</button>
+    <button onclick="filterHooks('lever','Temporal')" class="fb" data-hl="Temporal">Temporal</button>
+    <button onclick="filterHooks('lever','Framing')" class="fb" data-hl="Framing">Framing</button>
+  </div>
+  <div class="cd overflow-auto" style="max-height:calc(100vh - 200px)"><table>
+    <thead><tr><th>#</th><th>hook text</th><th>tactic group</th><th>psychology lever</th></tr></thead>
+    <tbody id="hooks-body"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ INPUTS: CTAs ============ -->
+<div id="page-inputs-ctas" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-3">
+    <h1 class="font-bold text-lg text-white">CTAs</h1>
+    <span class="badge" style="background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.2)">INPUTS</span>
+    <span class="font-mono text-xs text-gh ml-auto" id="ctas-count">80 CTAs</span>
+  </div>
+  <p class="text-xs text-gh mb-3">Call-to-action phrases from SAE. Tagged by Tactic Group + Psychology Lever.</p>
+  <div class="flex gap-1.5 mb-3 flex-wrap">
+    <button onclick="filterCTAs('group','all')" class="fb on" data-cg="all">All Groups</button>
+    <button onclick="filterCTAs('group','Offer')" class="fb" data-cg="Offer">Offer</button>
+    <button onclick="filterCTAs('group','Discovery Question')" class="fb" data-cg="Discovery Question">Discovery Q</button>
+    <button onclick="filterCTAs('group','Education')" class="fb" data-cg="Education">Education</button>
+    <button onclick="filterCTAs('group','Post-Purchase Care')" class="fb" data-cg="Post-Purchase Care">Post-Purchase</button>
+    <span class="border-l border-s3 mx-1"></span>
+    <button onclick="filterCTAs('lever','all')" class="fb on" data-cl="all">All Levers</button>
+    <button onclick="filterCTAs('lever','Reciprocity')" class="fb" data-cl="Reciprocity">Reciprocity</button>
+    <button onclick="filterCTAs('lever','Loss Aversion')" class="fb" data-cl="Loss Aversion">Loss Aversion</button>
+    <button onclick="filterCTAs('lever','Social Proof')" class="fb" data-cl="Social Proof">Social Proof</button>
+    <button onclick="filterCTAs('lever','Commitment')" class="fb" data-cl="Commitment">Commitment</button>
+    <button onclick="filterCTAs('lever','Scarcity')" class="fb" data-cl="Scarcity">Scarcity</button>
+    <button onclick="filterCTAs('lever','Autonomy')" class="fb" data-cl="Autonomy">Autonomy</button>
+    <button onclick="filterCTAs('lever','Goal Gradient')" class="fb" data-cl="Goal Gradient">Goal Gradient</button>
+    <button onclick="filterCTAs('lever','Endowment')" class="fb" data-cl="Endowment">Endowment</button>
+    <button onclick="filterCTAs('lever','Anchoring')" class="fb" data-cl="Anchoring">Anchoring</button>
+    <button onclick="filterCTAs('lever','Status Quo')" class="fb" data-cl="Status Quo">Status Quo</button>
+    <button onclick="filterCTAs('lever','Temporal')" class="fb" data-cl="Temporal">Temporal</button>
+    <button onclick="filterCTAs('lever','Framing')" class="fb" data-cl="Framing">Framing</button>
+  </div>
+  <div class="cd overflow-auto" style="max-height:calc(100vh - 200px)"><table>
+    <thead><tr><th>#</th><th>CTA text</th><th>tactic group</th><th>psychology lever</th></tr></thead>
+    <tbody id="ctas-body"></tbody>
+  </table></div>
+</div>
+
+<!-- ============ EXPORT ============ -->
+<div id="page-export" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">Export JSON</h1>
+    <span class="badge tn">FOR CHASE</span>
+  </div>
+
+  <!-- Config panel -->
+  <div class="cd p-4 mb-4">
+    <div class="grid grid-cols-3 gap-6">
+      <!-- Merchants -->
+      <div>
+        <div class="font-mono text-[10px] text-gh tracking-wider mb-2">MERCHANTS</div>
+        <div class="space-y-1.5">
+          <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="ex-rhoback" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">Rhoback</span> <span class="font-mono text-[10px] text-gh">(11 blueprints)</span></label>
+          <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="ex-wyze" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">Wyze</span> <span class="font-mono text-[10px] text-gh">(15 blueprints)</span></label>
+        </div>
+      </div>
+      <!-- Components -->
+      <div>
+        <div class="font-mono text-[10px] text-gh tracking-wider mb-2">INCLUDE</div>
+        <div class="space-y-1.5">
+          <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="ex-tactics" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">Tactics</span> <span class="font-mono text-[10px] text-gh">(welcome_sequence)</span></label>
+          <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="ex-blueprints" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">Blueprints</span></label>
+          <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="checkbox" id="ex-llm" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">LLM Tags</span> <span class="font-mono text-[10px] text-gh">(10 tags: 9 existing + 1 new)</span></label>
+        </div>
+      </div>
+      <!-- Output mode -->
+      <div>
+        <div class="font-mono text-[10px] text-gh tracking-wider mb-2">OUTPUT</div>
+        <div class="space-y-1.5">
+          <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="radio" name="ex-mode" value="single" checked onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">Single combined file</span></label>
+          <label class="flex items-center gap-2 text-xs cursor-pointer"><input type="radio" name="ex-mode" value="separate" onchange="renderExport()" class="accent-cyan-500"> <span class="text-gray-300">Separate file per merchant</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
+  <div class="flex items-center gap-3 mb-3">
+    <span class="font-mono text-xs text-gh" id="ex-summary"></span>
+  </div>
+
+  <!-- Output containers -->
+  <div id="ex-outputs" class="space-y-4"></div>
+</div>
+
+</main>
+
+<script>
+// ========== THEME ==========
+function toggleTheme(){
+  const b=document.body;
+  const isLight=b.classList.toggle('light');
+  document.getElementById('theme-btn').textContent=isLight?'light':'dark';
+  localStorage.setItem('v0-theme',isLight?'light':'dark');
+}
+(function(){const t=localStorage.getItem('v0-theme');if(t==='light'){document.body.classList.add('light');document.addEventListener('DOMContentLoaded',()=>{document.getElementById('theme-btn').textContent='light'})}})();
+
+// ========== LIVE PROD DATA (from API) ==========
+const PROD_TACTICS=[
+  {id:"00000001-0000-4000-8000-000000000000",version_group_id:"00000001-0000-4000-c000-000000000000",name:"browse_abandonment_recovery",display_name:"Browse Abandonment Recovery",description:"Re-engage subscribers who browsed products but did not purchase, using personalized product references and optional incentives.",metadata:{message_type:"conversion",lifecycle_stages:["consideration"],customer_states:["prospective_customer"],group:"nudge"},eligibility:[],blueprint_count:3},
+  {id:"00000002-0000-4000-8000-000000000000",version_group_id:"00000002-0000-4000-c000-000000000000",name:"bestseller_discovery",display_name:"Bestseller Discovery",description:"Introduce subscribers to the brand's most popular products using social proof and curated recommendations.",metadata:{message_type:"engagement",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer"],group:"social_proof"},eligibility:[],blueprint_count:3}
+];
+
+const PROD_BLUEPRINTS=[
+  {id:"00000001-0000-4000-9000-000000000000",version_group_id:"00000001-0000-4000-b000-000000000000",tactic_id:"00000001-0000-4000-8000-000000000000",tactic_name:"browse_abandonment_recovery",template_text:"Hey {{subscriber_first_name}}! It's {{brand_persona_name}} — noticed you were checking out [[browsed_product_colloquial_name]]. Still thinking it over? Let me know if you have any questions!",eligibility:[],metadata:{urgency:2,discount:1,conversational:5,brand_focus:2,levers:["personalization","engagement"],customer_states:[],lifecycle_stages:[],parent_id:null,full_reference_text:null}},
+  {id:"00000002-0000-4000-9000-000000000000",version_group_id:"00000002-0000-4000-b000-000000000000",tactic_id:"00000001-0000-4000-8000-000000000000",tactic_name:"browse_abandonment_recovery",template_text:"{{subscriber_first_name}}, still shopping for [[browsed_product_colloquial_category]]? Use code {{previously_issued_offer_code}} for {{previously_issued_offer_amount}} off your order. - {{brand_persona_name}}",eligibility:[],metadata:{urgency:3,discount:4,conversational:3,brand_focus:2,levers:["personalization","offer"],customer_states:[],lifecycle_stages:[],parent_id:null,full_reference_text:null}},
+  {id:"00000003-0000-4000-9000-000000000000",version_group_id:"00000003-0000-4000-b000-000000000000",tactic_id:"00000001-0000-4000-8000-000000000000",tactic_name:"browse_abandonment_recovery",template_text:"Hey {{subscriber_first_name}}! Still interested in [[browsed_product_colloquial_name]]? Take another look: [[browsed_product_url]] - {{brand_persona_name}}",eligibility:[],metadata:{urgency:2,discount:1,conversational:4,brand_focus:2,levers:["personalization"],customer_states:[],lifecycle_stages:[],parent_id:null,full_reference_text:null}},
+  {id:"00000004-0000-4000-9000-000000000000",version_group_id:"00000004-0000-4000-b000-000000000000",tactic_id:"00000002-0000-4000-8000-000000000000",tactic_name:"bestseller_discovery",template_text:"{{subscriber_first_name}}, have you seen [[popular_product_name]]? It's one of our most loved products with [[popular_product_review_count]] reviews. - {{brand_name}}",eligibility:[],metadata:{urgency:1,discount:1,conversational:4,brand_focus:3,levers:["personalization","social_proof"],customer_states:[],lifecycle_stages:[],parent_id:null,full_reference_text:null}},
+  {id:"00000005-0000-4000-9000-000000000000",version_group_id:"00000005-0000-4000-b000-000000000000",tactic_id:"00000002-0000-4000-8000-000000000000",tactic_name:"bestseller_discovery",template_text:"{{subscriber_first_name}}, meet [[popular_product_name]] — one of our bestsellers! Use code [[new_offer_code]] to get [[new_offer_amount]] off your first order. - {{brand_name}}",eligibility:[],metadata:{urgency:2,discount:4,conversational:3,brand_focus:3,levers:["personalization","offer","social_proof"],customer_states:[],lifecycle_stages:[],parent_id:null,full_reference_text:null}},
+  {id:"00000006-0000-4000-9000-000000000000",version_group_id:"00000006-0000-4000-b000-000000000000",tactic_id:"00000002-0000-4000-8000-000000000000",tactic_name:"bestseller_discovery",template_text:"Hey {{subscriber_first_name}}! Curious about what's trending? [[popular_product_name]] is a fan favorite. Browse the full collection: {{bestsellers_collection_url}} - {{brand_name}}",eligibility:[],metadata:{urgency:1,discount:1,conversational:4,brand_focus:3,levers:["personalization","social_proof"],customer_states:[],lifecycle_stages:[],parent_id:null,full_reference_text:null}}
+];
+
+const PROD_LLM=[
+  {id:"00000009-0000-4000-a000-000000000000",version_group_id:"00000009-0000-4000-d000-000000000000",key:"browsed_product_colloquial_category",description:"Casual category or type of product the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Determine the general category or type of the most relevant browsed product and return it in casual language (e.g. 'polos', 'hoodies', 'running shoes'). Return only the category name.",examples:["polos","hoodies","running shoes"],required_properties:[],metadata:{urgency:1,discount:1,conversational:5,brand_focus:2,levers:["personalization"]}},
+  {id:"00000008-0000-4000-a000-000000000000",version_group_id:"00000008-0000-4000-d000-000000000000",key:"browsed_product_colloquial_name",description:"Informal name of a product the subscriber recently browsed.",prompt:"You are given the subscriber's recent browse history. Pick the most relevant product and return a casual, conversational name for it. Do not use the exact catalog title — make it sound natural in a text message.",examples:["those polos you were checking out","the hoodie you were looking at"],required_properties:[],metadata:{urgency:2,discount:1,conversational:5,brand_focus:2,levers:["personalization"]}},
+  {id:"0000000a-0000-4000-a000-000000000000",version_group_id:"0000000a-0000-4000-d000-000000000000",key:"browsed_product_url",description:"URL to the specific product page the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Select the URL for the most relevant product the subscriber browsed. Return only the URL.",examples:["https://example.com/products/performance-polo","https://example.com/products/fleece-hoodie"],required_properties:[],metadata:{urgency:2,discount:1,conversational:1,brand_focus:2,levers:["personalization"]}},
+  {id:"00000005-0000-4000-a000-000000000000",version_group_id:"00000005-0000-4000-d000-000000000000",key:"new_offer_amount",description:"Discount amount corresponding to the selected offer code.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate offer and return its discount amount with units (e.g. '20%' or '$10 off'). Return only the amount string.",examples:["20%","$10 off","15% off"],required_properties:[],metadata:{urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"]}},
+  {id:"00000004-0000-4000-a000-000000000000",version_group_id:"00000004-0000-4000-d000-000000000000",key:"new_offer_code",description:"Discount code selected by the LLM from available strategic offers.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate discount code to offer this subscriber. Return only the discount code string exactly as provided.",examples:["SAVE20","WELCOME15"],required_properties:[],metadata:{urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"]}},
+  {id:"00000007-0000-4000-a000-000000000000",version_group_id:"00000007-0000-4000-d000-000000000000",key:"popular_collection_url",description:"Collection page URL for the featured popular product.",prompt:"You are given the brand's bestseller products. Select the collection or product page URL that best matches the featured popular product. Return only the URL.",examples:["https://example.com/collections/running","https://example.com/products/trail-runner-pro"],required_properties:[],metadata:{urgency:1,discount:1,conversational:1,brand_focus:3,levers:["personalization"]}},
+  {id:"00000006-0000-4000-a000-000000000000",version_group_id:"00000006-0000-4000-d000-000000000000",key:"popular_product_name",description:"Name of a top-selling or popular product selected by the LLM.",prompt:"You are given the brand's bestseller products. Pick the single most compelling product to feature by name. Return only the product name in a casual, customer-friendly way.",examples:["the Trail Runner Pro","our Classic Fleece Hoodie"],required_properties:[],metadata:{urgency:1,discount:1,conversational:4,brand_focus:3,levers:["personalization"]}},
+  {id:"0000000c-0000-4000-a000-000000000000",version_group_id:"0000000c-0000-4000-d000-000000000000",key:"popular_product_review_count",description:"Estimated review count for a featured popular product.",prompt:"You are given the brand's bestseller products. Estimate a compelling review count for the featured popular product. Return only a count string like '2,400+' or '500+'.",examples:["2,400+","500+","1,200+"],required_properties:[],metadata:{urgency:1,discount:1,conversational:3,brand_focus:3,levers:["social_proof"]}},
+  {id:"0000000b-0000-4000-a000-000000000000",version_group_id:"0000000b-0000-4000-d000-000000000000",key:"product_in_cart_colloquial_name",description:"Casual name for a product in the subscriber's cart.",prompt:"You are given the subscriber's cart contents. Pick the most relevant product and return a casual, conversational name for it that sounds natural in a text message. Do not use the exact catalog title.",examples:["that polo you added","the hoodie in your cart"],required_properties:[],metadata:{urgency:3,discount:2,conversational:5,brand_focus:2,levers:["personalization"]}}
+];
+
+const PROD_MERGE=[
+  {key:"brand_name",description:"The brand's marketing name from agent instructions.",example:"Alpine Gear Co"},
+  {key:"brand_persona_name",description:"First name of the brand's marketing persona.",example:"Alex"},
+  {key:"subscriber_first_name",description:"Subscriber's first name from the subscriber data connector.",example:"Jordan"},
+  {key:"previously_issued_offer_code",description:"Active discount code previously issued to the subscriber.",example:"WELCOME15"},
+  {key:"previously_issued_offer_amount",description:"Discount amount with units previously issued to the subscriber.",example:"15%"},
+  {key:"bestsellers_collection_url",description:"URL to the bestsellers collection page.",example:"https://example.com/collections/bestsellers"},
+  {key:"abandoned_checkout_url",description:"URL to the subscriber's abandoned checkout/cart.",example:"https://example.com/cart/abc123"},
+  {key:"shop_url",description:"URL to the brand's shop homepage.",example:"https://www.wyze.com/",status:"new"}
+];
+
+const PROD_PROPS=[
+  {key:"brand_name",description:"The brand's marketing name from agent instructions.",example:"Alpine Gear Co",return_type:"string"},
+  {key:"brand_persona_name",description:"First name of the brand's marketing persona.",example:"Alex",return_type:"string"},
+  {key:"subscriber_first_name",description:"Subscriber's first name from the subscriber data connector.",example:"Jordan",return_type:"string"},
+  {key:"previously_issued_offer_code",description:"Active discount code previously issued to the subscriber.",example:"WELCOME15",return_type:"string"},
+  {key:"previously_issued_offer_amount",description:"Discount amount with units previously issued to the subscriber.",example:"15%",return_type:"string"},
+  {key:"bestsellers_collection_url",description:"URL to the bestsellers collection page.",example:"https://example.com/collections/bestsellers",return_type:"string"},
+  {key:"strategic_offers",description:"Serialized strategic/unique offers from agent instructions for LLM selection.",example:'[{"code":"SAVE20","amount":"20%"}]',return_type:"string"},
+  {key:"bestseller_products",description:"Serialized bestseller product data for LLM context.",example:'[{"name":"Trail Runner Pro","url":"..."}]',return_type:"string"},
+  {key:"browsed_products",description:"Browsed product catalog data formatted for LLM context.",example:"Name: Fleece Hoodie\\nURL: ...",return_type:"string"},
+  {key:"cart_products",description:"Cart product catalog data formatted for LLM context.",example:"Name: Performance Polo\\nURL: ...",return_type:"string"},
+  {key:"subscriber_timeline",description:"Chronological timeline of subscriber interactions and events.",example:"=== Monday, Jan 06 ===\\n2:30 PM: Viewed...",return_type:"string"},
+  {key:"abandoned_checkout_url",description:"URL to the subscriber's abandoned checkout/cart.",example:"https://example.com/cart/abc123",return_type:"string"},
+  {key:"shop_url",description:"URL to the brand's shop homepage.",example:"https://www.wyze.com/",return_type:"string",status:"new"}
+];
+
+// ========== V0 BUILD DATA ==========
+const V0_TACTICS=[
+  {name:"product_feature_spotlight",display_name:"Product Feature Spotlight",description:"Spotlight a single product feature using pain-to-relief framing. Positions one specific feature as the solution to a relatable frustration.",message_type:"product_education",group:"education",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"usage_scenarios",display_name:"Usage Scenarios",description:"Paint vivid real-life moments where the product fits naturally into the subscriber's day. Uses 1-2 scenario format to help visualize ownership.",message_type:"product_education",group:"education",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"product_comparison",display_name:"Product Comparison",description:"Simplify choice between two similar products using if-then framing. Helps subscribers who browsed comparable items decide which fits best.",message_type:"product_education",group:"education",lifecycle_stages:["consideration"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"seasonal_product_relevance",display_name:"Seasonal Product Relevance",description:"Connect a product to an upcoming season, holiday, or event with gentle urgency. Deployed weeks before specific occasions.",message_type:"conversion",group:"nudge",lifecycle_stages:["interest","consideration","reactivation"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"value_focus",display_name:"Value Focus",description:"Acknowledge a universal pain point and position the product as the direct solution. Leads with empathy, then presents features and optional social proof.",message_type:"product_education",group:"education",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"product_category_question",display_name:"Product Category Question",description:"Ask subscribers what broad product category they are shopping for. Uses waterfall question structure from macro to specific. No links or offers.",message_type:"engagement",group:"discovery_question",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"style_preference_question",display_name:"Style Preference Question",description:"Ask about style preferences within a product category. Follows a category question in the discovery waterfall. Purely conversational.",message_type:"engagement",group:"discovery_question",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"favorite_feature_question",display_name:"Favorite Feature Question",description:"Present two product benefits as an embedded conversational choice. Uses 'Some people [verb] it for X, others for Y' format.",message_type:"engagement",group:"discovery_question",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"product_comparison_question",display_name:"Product Comparison Question",description:"Help a subscriber decide between products they have been comparing. Consultation-style guidance without pushing either option.",message_type:"engagement",group:"discovery_question",lifecycle_stages:["consideration"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"upgrade_or_new_question",display_name:"Upgrade or New Question",description:"Ask a returning customer whether they want to upgrade an existing product or explore a new category. Requires past purchase data.",message_type:"engagement",group:"discovery_question",lifecycle_stages:["consideration","post_purchase"],customer_states:["one_time_purchaser","repeat_customer"]},
+  {name:"urgency_question",display_name:"Urgency Question",description:"Surface purchase barriers by introducing urgency context such as upcoming events or demand signals. Uncovers what holds the subscriber back.",message_type:"engagement",group:"discovery_question",lifecycle_stages:["consideration","conversion"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"bestseller_showcase",display_name:"Bestseller Showcase",description:"Lead with a specific quantifiable social proof point such as units sold or review count. FOMO-inducing CTA. Day 2-3 for new subscribers.",message_type:"conversion",group:"social_proof",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"trending_now",display_name:"Trending Now",description:"Push a trending product using loss aversion. Leads with what the subscriber is missing rather than what they could gain.",message_type:"conversion",group:"social_proof",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"people_like_us_do_things_like_this",display_name:"People Like Us",description:"Build social identity alignment by connecting the subscriber to a tribe of like-minded buyers. 'People like me choose this brand' psychology.",message_type:"brand_inspiration",group:"social_proof",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"risk_mitigation_messaging",display_name:"Risk Mitigation Messaging",description:"Normalize purchase hesitation using customer testimonials. 'Others felt the same way, now they are saying [resolution]' pattern.",message_type:"conversion",group:"social_proof",lifecycle_stages:["consideration","conversion"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"product_competition",display_name:"Product Competition",description:"Create competitive social proof by highlighting other subscribers actively viewing or purchasing the same product. Implied scarcity through demand.",message_type:"conversion",group:"social_proof",lifecycle_stages:["consideration","conversion"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"staff_picks",display_name:"Staff Picks",description:"Deliver a personal product recommendation from the brand's named persona. First-person endorsement with a personal use case.",message_type:"product_education",group:"nudge",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"complementary_products",display_name:"Complementary Products",description:"Cross-sell a product that pairs naturally with a recent purchase or cart item. 'Perfect partner' framing. Sent after cart add or post-delivery.",message_type:"conversion",group:"nudge",lifecycle_stages:["conversion","post_purchase"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"alternative_product_suggestions",display_name:"Alternative Product Suggestions",description:"Recover from a rejected recommendation by diagnosing what was not right. Multiple choice options to redirect toward a better match.",message_type:"engagement",group:"nudge",lifecycle_stages:["consideration"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"conversation_followup",display_name:"Conversation Follow-up",description:"Re-engage after a previous agent conversation went cold for 24-48h. Analyzes endpoint to determine follow-up: objection, question, or goal.",message_type:"engagement",group:"nudge",lifecycle_stages:["consideration","conversion"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"origin_story",display_name:"Origin Story",description:"Share the brand's founding story for emotional connection. Always third-person voice, never impersonates founder. Relaxed urgency, pure brand focus.",message_type:"brand_inspiration",group:"brand_story",lifecycle_stages:["acquisition","interest"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"first_purchase_discount",display_name:"First Purchase Discount",description:"Welcome a new subscriber with a discount framed as a gift or thank-you. Zero lifetime orders only. Discount always included.",message_type:"conversion",group:"offer",lifecycle_stages:["acquisition","interest"],customer_states:["prospective_customer"]},
+  {name:"welcome_offer_reminder",display_name:"Welcome Offer Reminder",description:"Remind a subscriber about their unused welcome discount with a helpful nudge. Zero lifetime orders who received but have not used their initial offer.",message_type:"conversion",group:"offer",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer"]},
+  {name:"abandoned_purchase_discount",display_name:"Abandoned Purchase Discount",description:"Recover an abandoned cart by combining pain-to-relief framing with a discount as the barrier remover.",message_type:"conversion",group:"offer",lifecycle_stages:["conversion"],customer_states:["prospective_customer","one_time_purchaser"]},
+  {name:"repeat_purchase_discount",display_name:"Repeat Purchase Discount",description:"Reward returning customers with a loyalty discount framed as gratitude. Targets customers who have not purchased in at least 30 days.",message_type:"conversion",group:"offer",lifecycle_stages:["advocacy_loyalty","reactivation"],customer_states:["one_time_purchaser","repeat_customer"]},
+  {name:"temporary_sale_discount",display_name:"Temporary Sale Discount",description:"Announce a time-limited sale or promotion. Triggered when a temporary sales offer is active. Handles stackable discounts.",message_type:"conversion",group:"offer",lifecycle_stages:["interest","consideration","conversion","reactivation"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]},
+  {name:"offer_opt_in_upgrade",display_name:"Offer Opt-In Upgrade",description:"Upgrade a subscriber's standard welcome offer to a better one. Day 2-3 subscribers who have not used their initial offer.",message_type:"conversion",group:"offer",lifecycle_stages:["interest"],customer_states:["prospective_customer"]},
+  {name:"last_chance_reengagement",display_name:"Last Chance Re-engagement",description:"Final reminder before a welcome offer expires. Connects discount to a specific pain point. Discount always included as primary hook.",message_type:"conversion",group:"offer",lifecycle_stages:["interest","consideration"],customer_states:["prospective_customer"]},
+  {name:"product_education_series",display_name:"Product Education Series",description:"Post-purchase product tips and usage guidance. Sent 7-14 days after delivery. Zero sales language, focused on maximizing purchase value.",message_type:"product_education",group:"post_purchase_care",lifecycle_stages:["post_purchase"],customer_states:["one_time_purchaser","repeat_customer"]},
+  {name:"product_satisfaction_check",display_name:"Product Satisfaction Check",description:"Check in about a recent purchase. Sent 3-7 days after delivery. Purely relational with no links, incentives, or upsells.",message_type:"engagement",group:"post_purchase_care",lifecycle_stages:["post_purchase"],customer_states:["one_time_purchaser","repeat_customer"]},
+  {name:"usage_assistance_offer",display_name:"Usage Assistance Offer",description:"Proactively offer help with a product after purchase. Follows the satisfaction check. Entirely service-oriented with no sales intent.",message_type:"engagement",group:"support",lifecycle_stages:["post_purchase"],customer_states:["one_time_purchaser","repeat_customer"]},
+  {name:"customer_concern_resolution",display_name:"Customer Concern Resolution",description:"De-escalate customer concerns during a live conversation. Validate, paraphrase, solution-oriented question pattern.",message_type:"engagement",group:"support",lifecycle_stages:["consideration","conversion","post_purchase"],customer_states:["prospective_customer","one_time_purchaser","repeat_customer"]}
+];
+
+const V0_NEW_LLM=[
+  {key:"browsed_product_colloquial_name",description:"Informal name of a product the subscriber recently browsed.",prompt:"You are given the subscriber's recent browse history. Pick the most relevant product and return a casual, conversational name for it. Do not use the exact catalog title — make it sound natural in a text message.",examples:["those polos you were checking out","the hoodie you were looking at"],required_properties:["browsed_products"],urgency:2,discount:1,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
+  {key:"browsed_product_colloquial_category",description:"Casual category or type of product the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Determine the general category or type of the most relevant browsed product and return it in casual language (e.g. 'polos', 'hoodies', 'running shoes'). Return only the category name.",examples:["polos","hoodies","running shoes"],required_properties:["browsed_products"],urgency:1,discount:1,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
+  {key:"browsed_product_url",description:"URL to the specific product page the subscriber browsed.",prompt:"You are given the subscriber's recent browse history. Select the URL for the most relevant product the subscriber browsed. Return only the URL.",examples:["https://example.com/products/performance-polo","https://example.com/products/fleece-hoodie"],required_properties:["browsed_products"],urgency:2,discount:1,conversational:1,brand_focus:2,levers:["personalization"],status:"exists"},
+  {key:"popular_product_name",description:"Name of a top-selling or popular product selected by the LLM.",prompt:"You are given the brand's bestseller products. Pick the single most compelling product to feature by name. Return only the product name in a casual, customer-friendly way.",examples:["the Trail Runner Pro","our Classic Fleece Hoodie"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:4,brand_focus:3,levers:["personalization"],status:"exists"},
+  {key:"popular_product_review_count",description:"Estimated review count for a featured popular product.",prompt:"You are given the brand's bestseller products. Estimate a compelling review count for the featured popular product. Return only a count string like '2,400+' or '500+'.",examples:["2,400+","500+","1,200+"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:3,brand_focus:3,levers:["social_proof"],status:"exists"},
+  {key:"popular_collection_url",description:"Collection page URL for the featured popular product.",prompt:"You are given the brand's bestseller products. Select the collection or product page URL that best matches the featured popular product. Return only the URL.",examples:["https://example.com/collections/running","https://example.com/products/trail-runner-pro"],required_properties:["bestseller_products"],urgency:1,discount:1,conversational:1,brand_focus:3,levers:["personalization"],status:"exists"},
+  {key:"new_offer_code",description:"Discount code selected by the LLM from available strategic offers.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate discount code to offer this subscriber. Return only the discount code string exactly as provided.",examples:["SAVE20","WELCOME15"],required_properties:["strategic_offers"],urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"],status:"exists"},
+  {key:"new_offer_amount",description:"Discount amount corresponding to the selected offer code.",prompt:"You are given the brand's available strategic offers. Select the single most appropriate offer and return its discount amount with units (e.g. '20%' or '$10 off'). Return only the amount string.",examples:["20%","$10 off","15% off"],required_properties:["strategic_offers"],urgency:3,discount:5,conversational:1,brand_focus:1,levers:["offer"],status:"exists"},
+  {key:"product_in_cart_colloquial_name",description:"Casual name for a product in the subscriber's cart.",prompt:"You are given the subscriber's cart contents. Pick the most relevant product and return a casual, conversational name for it that sounds natural in a text message. Do not use the exact catalog title.",examples:["that polo you added","the hoodie in your cart"],required_properties:["cart_products"],urgency:3,discount:2,conversational:5,brand_focus:2,levers:["personalization"],status:"exists"},
+  {key:"product_in_cart_colloquial_category",description:"Casual category or type of product in the subscriber's cart.",prompt:"You are given the subscriber's cart contents. Determine the general category or type of the most relevant cart product and return it in casual language (e.g. 'security cameras', 'smart plugs', 'polos'). Return only the category name.",examples:["security cameras","smart plugs","hoodies"],required_properties:["cart_products"],urgency:3,discount:2,conversational:5,brand_focus:2,levers:["personalization"],status:"new"}
+];
+
+const V0_BLUEPRINTS=[
+  // Rhoback
+  {m:"rhoback",stage:"interest",slot:1,pid:1,tactic:"welcome_offer_reminder",strategy:"Offer reminder + bestsellers",
+   orig:"Your 15% off at Rhoback is yours to use today. If you're considering options, our bestsellers are well loved for a reason. Take a look here - and remember to use WELCOME15 at checkout: rhoback.com/collections/bestsellers",
+   tmpl:"Your {{previously_issued_offer_amount}} off at {{brand_name}} is yours to use today. If you're considering options, our bestsellers are well loved for a reason. Take a look here - and remember to use {{previously_issued_offer_code}} at checkout: {{bestsellers_collection_url}}",
+   mt:["previously_issued_offer_amount","brand_name","previously_issued_offer_code","bestsellers_collection_url"],lt:[],u:2,d:3,c:2,b:2,lv:["offer","personalization"]},
+  {m:"rhoback",stage:"interest",slot:2,pid:2,tactic:"bestseller_showcase",strategy:"Bestseller push + social proof",
+   orig:"Ready for something you'll reach for again and again? Check out our top-rated Hesi Performance Hoodies - available in tons of colors, with over 6,000 5-star reviews.\n\nMake it yours with WELCOME15: rhoback.com/collections/mens-tops-hesi-performance-hoodies",
+   tmpl:"Ready for something you'll reach for again and again? Check out our top-rated [[popular_product_name]] - available in tons of colors, with over [[popular_product_review_count]] 5-star reviews.\n\nMake it yours with {{previously_issued_offer_code}}: [[popular_collection_url]]",
+   mt:["previously_issued_offer_code"],lt:["popular_product_name","popular_product_review_count","popular_collection_url"],u:1,d:2,c:3,b:3,lv:["social_proof","offer"]},
+  {m:"rhoback",stage:"interest",slot:3,pid:3,tactic:"conversation_followup",strategy:"Conversational check-in",
+   orig:"Hey, it's Alex from Rhoback. It seems like we haven't quite hit the mark for you yet, and I can make this more relevant moving forward.\n\nCan you let me know if you are: 1) Still looking, or 2) No longer shopping right now?",
+   tmpl:"Hey, it's {{brand_persona_name}} from {{brand_name}}. It seems like we haven't quite hit the mark for you yet, and I can make this more relevant moving forward.\n\nCan you let me know if you are: 1) Still looking, or 2) No longer shopping right now?",
+   mt:["brand_persona_name","brand_name"],lt:[],u:1,d:1,c:5,b:2,lv:["engagement","personalization"]},
+  {m:"rhoback",stage:"consideration",slot:1,pid:1,tactic:"welcome_offer_reminder",strategy:"Product-specific offer",
+   orig:"Your 15% off at Rhoback is yours to use today. If something caught your eye, go back to it with WELCOME15 at checkout: [product_viewed_url]",
+   tmpl:"Your {{previously_issued_offer_amount}} off at {{brand_name}} is yours to use today. If something caught your eye, go back to it with {{previously_issued_offer_code}} at checkout: [[browsed_product_url]]",
+   mt:["previously_issued_offer_amount","brand_name","previously_issued_offer_code"],lt:["browsed_product_url"],u:2,d:3,c:2,b:2,lv:["offer","personalization"]},
+  {m:"rhoback",stage:"consideration",slot:2,pid:2,tactic:"product_feature_spotlight",strategy:"Product praise + offer",
+   orig:"Ready for something you'll reach for again and again? That [colloquial_viewed_product_name] is comfortable, flattering, and makes looking polished easy. Your WELCOME15 should still apply if you add it here: [product_viewed_url]",
+   tmpl:"Ready for something you'll reach for again and again? That [[browsed_product_colloquial_name]] is comfortable, flattering, and makes looking polished easy. Your {{previously_issued_offer_code}} should still apply if you add it here: [[browsed_product_url]]",
+   mt:["previously_issued_offer_code"],lt:["browsed_product_colloquial_name","browsed_product_url"],u:2,d:2,c:4,b:2,lv:["personalization","offer"]},
+  {m:"rhoback",stage:"consideration",slot:3,pid:4,tactic:"trending_now",strategy:"Social proof nudge",
+   orig:"Rhoback here with a friendly note: one of the [viewed_product_category] you viewed earlier has been a popular one lately. If it's still on your mind, this is a good time to go back for it: [product_viewed_url]",
+   tmpl:"{{brand_name}} here with a friendly note: one of the [[browsed_product_colloquial_category]] you viewed earlier has been a popular one lately. If it's still on your mind, this is a good time to go back for it: [[browsed_product_url]]",
+   mt:["brand_name"],lt:["browsed_product_colloquial_category","browsed_product_url"],u:2,d:1,c:3,b:3,lv:["social_proof","personalization"]},
+  {m:"rhoback",stage:"consideration",slot:4,pid:5,tactic:"urgency_question",strategy:"Conversational survey",
+   orig:"Hey, it's Alex from Rhoback checking in. Honest question: where are we missing the mark so far? A quick reply helps us make this more relevant for you.\n\nA) I can't find what I'm looking for\nB) I'm unsure of the fit\nC) Prices are more than I want to spend\nD) Something else\n\nJust text A, B, C, or D and we'll go from there.",
+   tmpl:"Hey, it's {{brand_persona_name}} from {{brand_name}} checking in. Honest question: where are we missing the mark so far? A quick reply helps us make this more relevant for you.\n\nA) I can't find what I'm looking for\nB) I'm unsure of the fit\nC) Prices are more than I want to spend\nD) Something else\n\nJust text A, B, C, or D and we'll go from there.",
+   mt:["brand_persona_name","brand_name"],lt:[],u:1,d:1,c:5,b:2,lv:["engagement","personalization"]},
+  {m:"rhoback",stage:"conversion",slot:1,pid:1,tactic:"abandoned_purchase_discount",strategy:"Cart recovery + offer",
+   orig:"Ready to go back for what you picked from Rhoback? Your 15% off is yours to use today. Use WELCOME15 at checkout here: [cart_link]",
+   tmpl:"Ready to go back for what you picked from {{brand_name}}? Your {{previously_issued_offer_amount}} off is yours to use today. Use {{previously_issued_offer_code}} at checkout here: {{abandoned_checkout_url}}",
+   mt:["brand_name","previously_issued_offer_amount","previously_issued_offer_code","abandoned_checkout_url"],lt:[],u:3,d:3,c:2,b:2,lv:["offer"]},
+  {m:"rhoback",stage:"conversion",slot:2,pid:2,tactic:"product_feature_spotlight",strategy:"Cart product praise",
+   orig:"Ready for something you'll reach for again and again? That striped polo makes getting dressed easy, no matter where you're headed. Your WELCOME15 should still apply if you add it now: [cart_link]",
+   tmpl:"Ready for something you'll reach for again and again? That [[product_in_cart_colloquial_name]] makes getting dressed easy, no matter where you're headed. Your {{previously_issued_offer_code}} should still apply if you add it now: {{abandoned_checkout_url}}",
+   mt:["previously_issued_offer_code","abandoned_checkout_url"],lt:["product_in_cart_colloquial_name"],u:2,d:2,c:4,b:2,lv:["personalization","offer"]},
+  {m:"rhoback",stage:"conversion",slot:3,pid:6,tactic:"trending_now",strategy:"Social proof cart nudge",
+   orig:"Rhoback here with a friendly note for you: something in your cart has been a popular choice lately. If it's still on your mind, this is a good time to go back for it: [cart_link]",
+   tmpl:"{{brand_name}} here with a friendly note for you: something in your cart has been a popular choice lately. If it's still on your mind, this is a good time to go back for it: {{abandoned_checkout_url}}",
+   mt:["brand_name","abandoned_checkout_url"],lt:[],u:2,d:1,c:3,b:3,lv:["social_proof"]},
+  {m:"rhoback",stage:"conversion",slot:4,pid:7,tactic:"last_chance_reengagement",strategy:"Final call urgency",
+   orig:"Final call to use your WELCOME15 from Rhoback. This will be our last reminder, so if you've been meaning to use it, here's your link: [cart_link]",
+   tmpl:"Final call to use your {{previously_issued_offer_code}} from {{brand_name}}. This will be our last reminder, so if you've been meaning to use it, here's your link: {{abandoned_checkout_url}}",
+   mt:["previously_issued_offer_code","brand_name","abandoned_checkout_url"],lt:[],u:5,d:2,c:2,b:2,lv:["offer"]},
+  // Wyze
+  {m:"wyze",stage:"interest",slot:0,pid:8,tactic:"welcome_offer_reminder",strategy:"Welcome + shipping tease",
+   orig:"Hi, it's Jerry from Wyze - your friendly neighborhood smart-home enabler. Just so you know, you can text this number anytime for quick help with questions. We'll send shipping updates here after your order, too.\n\nBe sure to try your welcome code soon, and let us know if you have trouble using it at checkout: [site_link]",
+   tmpl:"Hi, it's {{brand_persona_name}} from {{brand_name}} - your friendly neighborhood smart-home enabler. Just so you know, you can text this number anytime for quick help with questions. We'll send shipping updates here after your order, too.\n\nBe sure to try your welcome code soon, and let us know if you have trouble using it at checkout: {{shop_url}}",
+   mt:["brand_persona_name","brand_name","shop_url"],lt:[],u:1,d:1,c:5,b:3,lv:["engagement","personalization"]},
+  {m:"wyze",stage:"interest",slot:1,pid:9,tactic:"value_focus",strategy:"Value proposition",
+   orig:"You shouldn't have to overpay for smart home tech.\n\nWyze gives you smart security, app control, and solid quality at a price that actually makes sense.\n\nTake a look and see what fits your setup: https://www.wyze.com/",
+   tmpl:"You shouldn't have to overpay for smart home tech.\n\n{{brand_name}} gives you smart security, app control, and solid quality at a price that actually makes sense.\n\nTake a look and see what fits your setup: {{shop_url}}",
+   mt:["brand_name","shop_url"],lt:[],u:1,d:1,c:2,b:4,lv:["engagement"]},
+  {m:"wyze",stage:"interest",slot:2,pid:10,tactic:"trending_now",strategy:"Trending products",
+   orig:"Jerry from Wyze here. I've been eyeing some of our newest tech, and I think you'd love it. But it's going fast.\n\nCheck it out and don't miss out: [popular_collection_link]",
+   tmpl:"{{brand_persona_name}} from {{brand_name}} here. I've been eyeing some of our newest tech, and I think you'd love it. But it's going fast.\n\nCheck it out and don't miss out: [[popular_collection_url]]",
+   mt:["brand_persona_name","brand_name"],lt:["popular_collection_url"],u:3,d:1,c:4,b:3,lv:["social_proof","personalization"]},
+  {m:"wyze",stage:"interest",slot:3,pid:11,tactic:"product_category_question",strategy:"Discovery question",
+   orig:"Hey, it's Jerry again! I know you've been exploring some Wyze tech, and I'd love to send more relevant texts moving forward.\n\nHave you been shopping for something specific, or just browsing?\n\n[shop_link]",
+   tmpl:"Hey, it's {{brand_persona_name}} again! I know you've been exploring some {{brand_name}} tech, and I'd love to send more relevant texts moving forward.\n\nHave you been shopping for something specific, or just browsing?\n\n{{shop_url}}",
+   mt:["brand_persona_name","brand_name","shop_url"],lt:[],u:1,d:1,c:5,b:2,lv:["engagement","personalization"]},
+  {m:"wyze",stage:"interest",slot:4,pid:12,tactic:"last_chance_reengagement",strategy:"Final offer reminder",
+   orig:"Final call to use your [previously_issued_discount_code] from Wyze. This will be our last reminder, so if you've been meaning to use it, here's your link: [shop_link]",
+   tmpl:"Final call to use your {{previously_issued_offer_code}} from {{brand_name}}. This will be our last reminder, so if you've been meaning to use it, here's your link: {{shop_url}}",
+   mt:["previously_issued_offer_code","brand_name","shop_url"],lt:[],u:5,d:2,c:2,b:2,lv:["offer"]},
+  {m:"wyze",stage:"consideration",slot:0,pid:8,tactic:"welcome_offer_reminder",strategy:"Welcome + browsed product",
+   orig:"Hi, it's Jerry from Wyze here - your neighborhood smarthome expert. Just so you know, you can text here anytime for quick answers to questions. We'll send shipping updates from this number after you order, too.\n\nBe sure to try your [previously_issued_discount_code] code soon, and let us know if you have any trouble using it at checkout: [browsed_product_link]",
+   tmpl:"Hi, it's {{brand_persona_name}} from {{brand_name}} here - your neighborhood smarthome expert. Just so you know, you can text here anytime for quick answers to questions. We'll send shipping updates from this number after you order, too.\n\nBe sure to try your {{previously_issued_offer_code}} code soon, and let us know if you have any trouble using it at checkout: [[browsed_product_url]]",
+   mt:["brand_persona_name","brand_name","previously_issued_offer_code"],lt:["browsed_product_url"],u:1,d:2,c:5,b:3,lv:["engagement","personalization"]},
+  {m:"wyze",stage:"consideration",slot:1,pid:13,tactic:"welcome_offer_reminder",strategy:"Product praise + offer",
+   orig:"Ready for an affordable tech upgrade? That [colloquial_viewed_product_name] is worth a second look. Your [previously_issued_discount_code] should still apply if you add it here: [product_viewed_url]",
+   tmpl:"Ready for an affordable tech upgrade? That [[browsed_product_colloquial_name]] is worth a second look. Your {{previously_issued_offer_code}} should still apply if you add it here: [[browsed_product_url]]",
+   mt:["previously_issued_offer_code"],lt:["browsed_product_colloquial_name","browsed_product_url"],u:2,d:2,c:3,b:2,lv:["personalization","offer"]},
+  {m:"wyze",stage:"consideration",slot:2,pid:14,tactic:"trending_now",strategy:"Social proof nudge",
+   orig:"Wyze here with a quick note: one of the [viewed_product_category] you viewed earlier has been a popular one lately. If it's still on your mind, this is a good time to go back for it: [product_viewed_url]",
+   tmpl:"{{brand_name}} here with a quick note: one of the [[browsed_product_colloquial_category]] you viewed earlier has been a popular one lately. If it's still on your mind, this is a good time to go back for it: [[browsed_product_url]]",
+   mt:["brand_name"],lt:["browsed_product_colloquial_category","browsed_product_url"],u:2,d:1,c:3,b:3,lv:["social_proof","personalization"]},
+  {m:"wyze",stage:"consideration",slot:3,pid:11,tactic:"product_category_question",strategy:"Discovery question",
+   orig:"Hey, it's Jerry again! I know you've been exploring some Wyze tech, and I'd love to send more relevant texts moving forward.\n\nHave you been shopping for something specific, or just browsing?\n\n[product_viewed_url]",
+   tmpl:"Hey, it's {{brand_persona_name}} again! I know you've been exploring some {{brand_name}} tech, and I'd love to send more relevant texts moving forward.\n\nHave you been shopping for something specific, or just browsing?\n\n[[browsed_product_url]]",
+   mt:["brand_persona_name","brand_name"],lt:["browsed_product_url"],u:1,d:1,c:5,b:2,lv:["engagement","personalization"]},
+  {m:"wyze",stage:"consideration",slot:4,pid:12,tactic:"last_chance_reengagement",strategy:"Final offer reminder",
+   orig:"Final call to use your [previously_issued_discount_code] from Wyze. This will be our last reminder, so if you've been meaning to use it, here's your link: [shop_link]",
+   tmpl:"Final call to use your {{previously_issued_offer_code}} from {{brand_name}}. This will be our last reminder, so if you've been meaning to use it, here's your link: {{shop_url}}",
+   mt:["previously_issued_offer_code","brand_name","shop_url"],lt:[],u:5,d:2,c:2,b:2,lv:["offer"]},
+  {m:"wyze",stage:"conversion",slot:0,pid:8,tactic:"welcome_offer_reminder",strategy:"Welcome + cart link",
+   orig:"Hi, it's Wyze here. Just so you know, you can text this number anytime for quick help with questions as you're placing your order. We'll send shipping updates from this number, too.\n\nBe sure to try your welcome code soon, and let us know if you have any trouble using it at checkout: [cart_link]",
+   tmpl:"Hi, it's {{brand_name}} here. Just so you know, you can text this number anytime for quick help with questions as you're placing your order. We'll send shipping updates from this number, too.\n\nBe sure to try your welcome code soon, and let us know if you have any trouble using it at checkout: {{abandoned_checkout_url}}",
+   mt:["brand_name","abandoned_checkout_url"],lt:[],u:1,d:1,c:4,b:3,lv:["engagement"]},
+  {m:"wyze",stage:"conversion",slot:1,pid:15,tactic:"urgency_question",strategy:"Cart urgency",
+   orig:"Hey {{subscriber.first_name}} it's Jerry from {{shop.name}}. Quick Q for ya: you're not planning on forgetting about that cool tech in your cart, right? It's available now, and I don't want you to miss out on this chance.\n\nTake 10 seconds to wrap it up here: [cart_link]",
+   tmpl:"Hey {{subscriber_first_name}} it's {{brand_persona_name}} from {{brand_name}}. Quick Q for ya: you're not planning on forgetting about that cool tech in your cart, right? It's available now, and I don't want you to miss out on this chance.\n\nTake 10 seconds to wrap it up here: {{abandoned_checkout_url}}",
+   mt:["subscriber_first_name","brand_persona_name","brand_name","abandoned_checkout_url"],lt:[],u:4,d:1,c:5,b:2,lv:["personalization","engagement"]},
+  {m:"wyze",stage:"conversion",slot:2,pid:16,tactic:"product_competition",strategy:"Demand scarcity",
+   orig:"Hey {{subscriber.first_name}}, this is Jerry from Wyze. I wanted to give you a quick heads-up: we're experiencing high demand for our [product_in_cart_colloquial_name]. If you're ready to join the millions of satisfied Wyze users, it's best to act soon. Your link is waiting: [cart_link]",
+   tmpl:"Hey {{subscriber_first_name}}, this is {{brand_persona_name}} from {{brand_name}}. I wanted to give you a quick heads-up: we're experiencing high demand for our [[product_in_cart_colloquial_name]]. If you're ready to join the millions of satisfied {{brand_name}} users, it's best to act soon. Your link is waiting: {{abandoned_checkout_url}}",
+   mt:["subscriber_first_name","brand_persona_name","brand_name","abandoned_checkout_url"],lt:["product_in_cart_colloquial_name"],u:4,d:1,c:4,b:3,lv:["social_proof","personalization"]},
+  {m:"wyze",stage:"conversion",slot:3,pid:17,tactic:"conversation_followup",strategy:"No-oriented question",
+   orig:"Hey, it's Jerry again. Did you decide against that [product_in_cart_colloquial_category]? Let us know if you still want it set aside, or if you're looking for something different.\n\n[cart_link]",
+   tmpl:"Hey, it's {{brand_persona_name}} again. Did you decide against that [[product_in_cart_colloquial_category]]? Let us know if you still want it set aside, or if you're looking for something different.\n\n{{abandoned_checkout_url}}",
+   mt:["brand_persona_name","abandoned_checkout_url"],lt:["product_in_cart_colloquial_category"],u:2,d:1,c:5,b:2,lv:["engagement","personalization"]},
+  {m:"wyze",stage:"conversion",slot:4,pid:12,tactic:"last_chance_reengagement",strategy:"Final offer reminder",
+   orig:"Final call to use your [previously_issued_discount_code] from Wyze. This will be our last reminder, so if you've been meaning to use it, here's your link: [cart_link]",
+   tmpl:"Final call to use your {{previously_issued_offer_code}} from {{brand_name}}. This will be our last reminder, so if you've been meaning to use it, here's your link: {{abandoned_checkout_url}}",
+   mt:["previously_issued_offer_code","brand_name","abandoned_checkout_url"],lt:[],u:5,d:2,c:2,b:2,lv:["offer"]}
+];
+
+// ========== RENDER ==========
+function nav(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+  const el=document.getElementById('page-'+p);
+  el.classList.add('active');
+  document.querySelector(`[data-p="${p}"]`).classList.add('active');
+  if(p==='export') renderExport();
+}
+
+function hl(t){return t.replace(/\{\{(\w+)\}\}/g,'<span class="hm">{{$1}}</span>').replace(/\[\[(\w+)\]\]/g,'<span class="hl">[[$1]]</span>').replace(/\n/g,'<br>')}
+function esc(s){return s.replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function badges(arr,cls){return arr.map(x=>`<span class="badge ${cls}">${x}</span>`).join(' ')}
+
+function renderToday(){
+  // Tactics
+  document.getElementById('t-tactics').innerHTML=PROD_TACTICS.map(t=>`<tr>
+    <td class="font-mono text-xs text-white">${t.name}</td>
+    <td class="text-white">${t.display_name}</td>
+    <td><span class="badge tm">${t.metadata.message_type}</span></td>
+    <td><span class="badge tp">${t.metadata.group}</span></td>
+    <td>${t.metadata.lifecycle_stages.map(s=>`<span class="badge tn">${s}</span>`).join(' ')}</td>
+    <td>${t.metadata.customer_states.map(s=>`<span class="badge tl">${s}</span>`).join(' ')}</td>
+    <td class="font-mono text-center">${t.blueprint_count}</td>
+    <td class="font-mono text-[10px] text-gh/50">${t.id.slice(0,8)}...</td>
+  </tr>`).join('');
+
+  // Blueprints
+  document.getElementById('t-blueprints').innerHTML=PROD_BLUEPRINTS.map(b=>`<tr>
+    <td class="font-mono text-[10px]">${b.tactic_name}</td>
+    <td class="max-w-md"><div class="text-xs leading-relaxed">${hl(b.template_text)}</div></td>
+    <td class="font-mono text-center">${b.metadata.urgency}</td>
+    <td class="font-mono text-center">${b.metadata.discount}</td>
+    <td class="font-mono text-center">${b.metadata.conversational}</td>
+    <td class="font-mono text-center">${b.metadata.brand_focus}</td>
+    <td>${badges(b.metadata.levers,'tl')}</td>
+    <td class="font-mono text-[10px] text-gh/50">${b.id.slice(0,8)}...</td>
+  </tr>`).join('');
+
+  // LLM Tags
+  document.getElementById('t-llm').innerHTML=PROD_LLM.map(t=>`<tr>
+    <td class="font-mono text-xs text-white whitespace-nowrap">${t.key}</td>
+    <td class="text-xs max-w-xs">${t.description}</td>
+    <td class="text-[11px] text-gh max-w-xs">${t.prompt.slice(0,80)}...</td>
+    <td class="text-[11px] text-gh">${t.examples.join(', ')}</td>
+    <td class="font-mono text-center">${t.metadata.urgency}</td>
+    <td class="font-mono text-center">${t.metadata.discount}</td>
+    <td class="font-mono text-center">${t.metadata.conversational}</td>
+    <td class="font-mono text-center">${t.metadata.brand_focus}</td>
+    <td>${badges(t.metadata.levers,'tl')}</td>
+  </tr>`).join('');
+
+  // Merge
+  document.getElementById('t-merge').innerHTML=PROD_MERGE.map(t=>`<tr>
+    <td class="font-mono text-xs text-white">${t.key}</td>
+    <td class="font-mono text-xs hm">{{${t.key}}}</td>
+    <td class="text-xs">${t.description}</td>
+    <td class="font-mono text-xs text-gh">${t.example}</td>
+    <td>${t.status==='new'?'<span class="badge tg">NEW</span>':''}</td>
+  </tr>`).join('');
+
+  // Props
+  document.getElementById('t-props').innerHTML=PROD_PROPS.map(p=>`<tr>
+    <td class="font-mono text-xs text-white">${p.key}</td>
+    <td class="text-xs">${p.description}</td>
+    <td class="font-mono text-xs text-gh max-w-xs truncate" title="${esc(p.example)}">${esc(p.example).slice(0,60)}</td>
+    <td class="font-mono text-xs text-gh">${p.return_type}</td>
+  </tr>`).join('');
+}
+
+// V0 renders
+function renderV0(){
+  // Tactics
+  document.getElementById('v0-tactics-body').innerHTML=V0_TACTICS.map(t=>`<tr>
+    <td class="font-mono text-xs text-white">${t.name}</td>
+    <td class="text-white text-xs">${t.display_name}</td>
+    <td class="text-xs max-w-sm">${t.description}</td>
+    <td><span class="badge tm">${t.message_type}</span></td>
+    <td><span class="badge tp">${t.group}</span></td>
+    <td>${t.lifecycle_stages.map(s=>`<span class="badge tn">${s}</span>`).join(' ')}</td>
+    <td>${t.customer_states.map(s=>`<span class="badge tl">${s}</span>`).join(' ')}</td>
+  </tr>`).join('');
+
+  // New LLM Tags
+  document.getElementById('v0-llm-body').innerHTML=V0_NEW_LLM.map(t=>`<tr>
+    <td class="font-mono text-xs text-white whitespace-nowrap">${t.key}</td>
+    <td><span class="badge ${t.status==='new'?'tg':'tm'}">${t.status}</span></td>
+    <td class="text-xs">${t.description}</td>
+    <td class="text-[11px] text-gh max-w-xs">${t.prompt}</td>
+    <td class="text-[11px] text-gh">${t.examples.join(', ')}</td>
+    <td class="font-mono text-xs text-gh">${t.required_properties.length?t.required_properties.join(', '):'[]'}</td>
+    <td class="font-mono text-center">${t.urgency}</td>
+    <td class="font-mono text-center">${t.discount}</td>
+    <td class="font-mono text-center">${t.conversational}</td>
+    <td class="font-mono text-center">${t.brand_focus}</td>
+    <td>${badges(t.levers,'tl')}</td>
+  </tr>`).join('');
+
+  renderBPTable();
+}
+
+let fM='all',fS='all';
+function filterBP(v){fM=v;document.querySelectorAll('[data-f]').forEach(b=>{b.classList.toggle('on',b.dataset.f===v)});renderBPTable()}
+function filterStage(v){fS=v;document.querySelectorAll('[data-s]').forEach(b=>{b.classList.toggle('on',b.dataset.s===v)});renderBPTable()}
+
+function renderBPTable(){
+  const sc={interest:'border-l-2 border-cyan-500/40',consideration:'border-l-2 border-purple-500/40',conversion:'border-l-2 border-amber-500/40'};
+  const mc={rhoback:'bg-emerald-500/8 text-emerald-400',wyze:'bg-yellow-500/8 text-yellow-400'};
+  const stc={interest:'bg-cyan-500/10 text-cyan-400',consideration:'bg-purple-500/10 text-purple-400',conversion:'bg-amber-500/10 text-amber-400'};
+  const f=V0_BLUEPRINTS.filter(b=>(fM==='all'||b.m===fM)&&(fS==='all'||b.stage===fS));
+  document.getElementById('v0-bp-body').innerHTML=f.map(b=>`<tr class="${sc[b.stage]||''}">
+    <td><span class="badge ${mc[b.m]||''}">${b.m}</span></td>
+    <td><span class="badge ${stc[b.stage]||''}">${b.stage}</span></td>
+    <td class="font-mono text-center">${b.slot}</td>
+    <td><span class="badge tp font-mono text-[9px]">${b.tactic}</span></td>
+    <td class="max-w-md"><div class="text-xs leading-relaxed">${hl(b.tmpl)}</div></td>
+    <td class="max-w-xs"><div class="text-[11px] text-gh leading-relaxed">${b.orig.replace(/\n/g,'<br>').slice(0,120)}...</div></td>
+    <td class="font-mono text-center">${b.u}</td>
+    <td class="font-mono text-center">${b.d}</td>
+    <td class="font-mono text-center">${b.c}</td>
+    <td class="font-mono text-center">${b.b}</td>
+    <td>${badges(b.lv,'tl')}</td>
+    <td>${b.mt.map(x=>`<span class="badge tm">${x}</span>`).join(' ')}</td>
+    <td>${b.lt.map(x=>`<span class="badge tl">${x}</span>`).join(' ')||'<span class="text-gh/30">—</span>'}</td>
+  </tr>`).join('');
+}
+
+// ========== EXPORT ==========
+// Pinned UUIDs from delivered seed files (rhoback_v0_seed*.json)
+const DELIVERED_TACTIC_IDS={
+  "product_feature_spotlight":{id:"87b718c8-4ce5-4524-8d0c-60db0e60c89b",vgId:"0ddf0561-1ed0-4785-9775-04c910ac608b"},
+  "usage_scenarios":{id:"f50be644-c8fe-459e-b076-e25dde65b068",vgId:"9098b48c-d320-421e-81fa-14636c474a5b"},
+  "product_comparison":{id:"736e0592-3bcc-45ff-afce-5af9fbe6e2c9",vgId:"5ffb3662-2e8a-4b3e-aaf7-723f4677c57a"},
+  "seasonal_product_relevance":{id:"74d65fc5-0676-4749-b73e-43887cd8bf90",vgId:"548d1e5f-6083-43ba-a6d1-5e0ad0d98cea"},
+  "value_focus":{id:"f86f0974-93c9-47f7-93d7-0f9e9b6dd695",vgId:"f4bf46b3-1400-46ad-82fb-532f1b3a61c3"},
+  "product_category_question":{id:"8e080c60-3235-404e-8e3d-16602ae41e98",vgId:"d67a0447-834a-4727-a0c0-685294715e99"},
+  "style_preference_question":{id:"8ecd8e07-f843-4e80-920c-4c66e83ca9bb",vgId:"c8c5ca8f-38a2-423f-9048-b5bd7bec4aa4"},
+  "favorite_feature_question":{id:"aa9fa708-2766-462c-830b-2ebe5b57c241",vgId:"92c8e5ce-935b-4fac-9a9e-aca7168008ed"},
+  "product_comparison_question":{id:"7ef0ced4-f1ce-4d40-b4c1-ca9a6723b71f",vgId:"679b8566-413c-4665-a609-488ce814f1e4"},
+  "upgrade_or_new_question":{id:"b62521b7-bb37-49ab-96cb-ff37afea6f0a",vgId:"89f3b36a-5489-4caf-8510-0b78b55e8ee6"},
+  "urgency_question":{id:"1875bd75-755b-49ea-b04b-d1ff217c35d6",vgId:"bc383ee5-547f-43f8-b88d-a5be127ef442"},
+  "bestseller_showcase":{id:"e61cc680-2d7e-4cf4-b8fb-bdf7c473d4c6",vgId:"fb2eb56d-7664-4718-a4e5-f4c65412067f"},
+  "trending_now":{id:"aea0689d-44c1-4898-9c83-9101a14298e9",vgId:"1c4bc8c0-a631-4937-a7e4-f7d8a3868b8d"},
+  "people_like_us_do_things_like_this":{id:"7587985f-d84e-42cc-b0d2-e04918379330",vgId:"0e45d69d-3364-474a-ac67-2b5642c33627"},
+  "risk_mitigation_messaging":{id:"4e6c8eaa-8732-4926-978c-6f798ed298af",vgId:"6a088810-1496-459f-89ef-6f1bf66548fc"},
+  "product_competition":{id:"a2f9f000-1145-40d5-8ad2-598413eb04b7",vgId:"7d711a46-81c9-409c-8dea-dd71b2c7bbbf"},
+  "staff_picks":{id:"a5dda269-ec4d-40d9-b348-2483a639a82f",vgId:"7d0f85e1-d868-426f-90d3-841dd295cb70"},
+  "complementary_products":{id:"f0cf7e7e-6dd5-4fce-bd54-56cb3fddc0d6",vgId:"9967c426-8c96-4b7a-a223-949e26cbb415"},
+  "alternative_product_suggestions":{id:"a5dc6994-b863-4f6c-ba28-4be03ce15577",vgId:"304b9153-8e71-4b1b-bd08-dda597f99b43"},
+  "conversation_followup":{id:"edce6394-9494-47c0-9e52-987505aa013e",vgId:"8a6a3cb7-8ab6-402f-823c-36e357debbc7"},
+  "origin_story":{id:"59c547eb-b6ce-4af3-b9cb-cc237e3c67ab",vgId:"b6a7b2a3-475a-4eb9-b2bd-e279bc3c89cb"},
+  "first_purchase_discount":{id:"62fb4ae7-5017-4f8e-84d1-7b36c8711da0",vgId:"75184976-2b79-4648-8d09-ff85f5f3e34c"},
+  "welcome_offer_reminder":{id:"12345b19-adf7-4aab-8242-b0064877df4f",vgId:"fa75d49e-4657-41fd-afd7-5f2917069219"},
+  "abandoned_purchase_discount":{id:"1688d9f2-cc6d-4208-abf9-95a61a8ce5a6",vgId:"feb1808f-1236-4a4f-85f1-48b86038e4bd"},
+  "repeat_purchase_discount":{id:"c5d79db0-c816-4a6d-af73-cbd43529fa8e",vgId:"d4d16177-68c1-4804-a2ee-066b9161b802"},
+  "temporary_sale_discount":{id:"03d3192b-52af-40c9-b542-dad57fc895f1",vgId:"27f5e0b7-0225-40e7-ab2b-8f5946580dab"},
+  "offer_opt_in_upgrade":{id:"c879a4f5-8637-438c-aa4d-69f3d362a7ca",vgId:"e92a9dd7-d1b2-463b-9665-3e95a5ef0345"},
+  "last_chance_reengagement":{id:"18b997ba-2c88-4763-adba-2fb185aaaaa5",vgId:"a8df96fe-cf7b-4147-8b10-e5f6f7ba4216"},
+  "product_education_series":{id:"4f9970f4-8177-4bf7-8aab-b68dab116fe2",vgId:"bee15c92-5b55-499a-bff8-c526c12d87c3"},
+  "product_satisfaction_check":{id:"8e14d283-5d21-4b14-9434-579bd8b2ecdd",vgId:"ffb2a114-cc5a-4033-a35c-ab33ae0d0d31"},
+  "usage_assistance_offer":{id:"e2a1b995-4043-4208-98d9-b7266906c393",vgId:"46b5dc5e-3109-4ad9-98a3-eab9df63fb0e"},
+  "customer_concern_resolution":{id:"cb07b75c-c118-44af-b0c0-d634eafc7084",vgId:"b3ac994e-c117-4d58-bc3a-3e6461e251fd"}
+};
+
+const DELIVERED_LLM_IDS={
+  "browsed_product_colloquial_name":{id:"d521c30b-46b8-4b41-aee0-63f1cd330d53",vgId:"890ddbe9-17d1-44d0-b13d-38e34934b444"},
+  "browsed_product_colloquial_category":{id:"49dad1ea-a18d-40f3-a718-d818c411335f",vgId:"d4fd27f8-6dff-4f62-83ae-3fc2933d5ac2"},
+  "browsed_product_url":{id:"6bb188d0-b7be-45a9-892f-1a0e62848344",vgId:"e0e4087d-d355-4c16-84c5-5fc4786d280f"},
+  "popular_product_name":{id:"ba2cc3a4-5825-4651-9be6-25bbdafca64c",vgId:"247d9ca6-b366-4c5a-9a4d-0e9a6c13128f"},
+  "popular_product_review_count":{id:"fdb0bda7-32ab-429a-9d82-a18e6056b666",vgId:"bf4ed19f-48e4-40ec-a24f-198f871cda1e"},
+  "popular_collection_url":{id:"592732d1-064c-40e9-a1f1-4b1cc8c4bc69",vgId:"aba2a0f1-3458-4cfd-9f76-2b944c4ded59"},
+  "new_offer_code":{id:"f83c7483-971b-4df7-baf0-cc1f1a9d54ea",vgId:"fc67a928-d7b1-4c24-bed0-ac8531c5470c"},
+  "new_offer_amount":{id:"27dc466c-f80f-4cc5-8829-af635eb2a202",vgId:"35b8eff1-4ec6-47fa-91a2-edc9a8c4c06c"},
+  "product_in_cart_colloquial_name":{id:"807a5629-16cf-450b-a735-b6f80e5ce8cf",vgId:"10235f51-5ee5-479e-8931-cfcfca65ebfa"},
+  "product_in_cart_colloquial_category":{id:"0df68be3-c007-4cd2-a57b-971a17a9f8c2",vgId:"20395137-5752-4d26-8b5c-a0cb1c7e8430"}
+};
+
+// Rhoback blueprint IDs keyed by "stage-slot"
+const DELIVERED_BP_IDS={
+  "rhoback-interest-1":{id:"b10f59c1-3606-4567-8b9e-10f0cab738ed",vgId:"48eecfe9-8941-4805-9dae-227c84b7c786"},
+  "rhoback-interest-2":{id:"bcecbd28-bcde-4908-aafe-4fa71c192138",vgId:"1add8ca1-1772-49a1-bb92-7168a45efb23"},
+  "rhoback-interest-3":{id:"b25ab58f-f3e9-4aa7-9d6b-059b2b15e2cd",vgId:"2587f97f-d030-485f-8b2a-ac80fbc35b1d"},
+  "rhoback-consideration-1":{id:"d1cd9152-abe2-416b-a767-fd3dc34b16da",vgId:"657d03d1-7194-4cb8-8323-fa1cf6eb25b4"},
+  "rhoback-consideration-2":{id:"55c8e992-c46e-4120-800d-43d81e272044",vgId:"a1c67045-1205-4af6-83e8-7d7a2da1533c"},
+  "rhoback-consideration-3":{id:"b79d5b9d-a3eb-47ad-98d2-527719e672e8",vgId:"bf54bd41-a6ac-45b8-9996-e23f37187917"},
+  "rhoback-consideration-4":{id:"7b1ae682-9185-434c-a9c3-5accb2903285",vgId:"8e270333-d95b-4c30-bab0-0b06bb1ae95b"},
+  "rhoback-conversion-1":{id:"25d8cd65-b7bb-4afb-bd90-5c2a502d380b",vgId:"59515b98-d92c-4d8b-9579-f489aa8971fe"},
+  "rhoback-conversion-2":{id:"f96d0787-e9c1-4704-8a81-c73cdec50fb5",vgId:"bde917c8-ab90-4786-8a97-4c643d43e139"},
+  "rhoback-conversion-3":{id:"445b40a3-a808-4083-89a1-2b7a4de442be",vgId:"e21d6be4-28d2-44c8-bfac-859b99c98b21"},
+  "rhoback-conversion-4":{id:"dee5aff0-04b4-4e42-955c-20f599b049a6",vgId:"899214ae-2a67-49ef-9510-ab6a2f0e7b3f"}
+};
+
+// Fallback UUID generator for Wyze blueprints (not yet delivered)
+let _uuidCache={};
+function uuid(key){
+  if(key&&_uuidCache[key])return _uuidCache[key];
+  const id='xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&0x3|0x8)).toString(16)});
+  if(key)_uuidCache[key]=id;
+  return id;
+}
+
+function getExOpts(){
+  return {
+    rhoback:document.getElementById('ex-rhoback').checked,
+    wyze:document.getElementById('ex-wyze').checked,
+    tactics:document.getElementById('ex-tactics').checked,
+    blueprints:document.getElementById('ex-blueprints').checked,
+    llm:document.getElementById('ex-llm').checked,
+    mode:document.querySelector('input[name="ex-mode"]:checked').value
+  };
+}
+
+function buildForMerchants(merchants,opts){
+  const result={};
+
+  if(opts.tactics){
+    result.tactics=V0_TACTICS.map(t=>{
+      const ids=DELIVERED_TACTIC_IDS[t.name]||{id:uuid(`tactic-${t.name}`),vgId:uuid(`tactic-vg-${t.name}`)};
+      return {
+        id:ids.id,version_group_id:ids.vgId,
+        name:t.name,display_name:t.display_name,description:t.description,
+        metadata:{message_type:t.message_type,lifecycle_stages:t.lifecycle_stages,customer_states:t.customer_states,group:t.group},
+        eligibility:[]
+      };
+    });
+  } else { result.tactics=[]; }
+
+  if(opts.blueprints){
+    const filtered=V0_BLUEPRINTS.filter(b=>merchants.includes(b.m));
+    result.blueprints=filtered.map(b=>{
+      const bpKey=`${b.m}-${b.stage}-${b.slot}`;
+      const bpIds=DELIVERED_BP_IDS[bpKey]||{id:uuid(`bp-${bpKey}`),vgId:uuid(`bp-vg-${bpKey}`)};
+      const tacticRef=DELIVERED_TACTIC_IDS[b.tactic];
+      const tid=tacticRef?tacticRef.id:uuid(`tactic-${b.tactic}`);
+      return {
+        id:bpIds.id,
+        version_group_id:bpIds.vgId,
+        tactic_id:tid,
+        template_text:b.tmpl,
+        eligibility:[],
+        metadata:{urgency:b.u,discount:b.d,conversational:b.c,brand_focus:b.b,levers:b.lv}
+      };
+    });
+  } else { result.blueprints=[]; }
+
+  if(opts.llm){
+    result.llm_tags=V0_NEW_LLM.map(t=>{
+      const ids=DELIVERED_LLM_IDS[t.key]||{id:uuid(`llm-${t.key}`),vgId:uuid(`llm-vg-${t.key}`)};
+      return {
+        id:ids.id,version_group_id:ids.vgId,
+        key:t.key,description:t.description,prompt:t.prompt,
+        examples:t.examples,required_properties:t.required_properties,
+        metadata:{urgency:t.urgency,discount:t.discount,conversational:t.conversational,brand_focus:t.brand_focus,levers:t.levers}
+      };
+    });
+  } else { result.llm_tags=[]; }
+
+  // Remove empty top-level keys for clean output
+  if(!result.tactics.length) delete result.tactics;
+  if(!result.blueprints.length) delete result.blueprints;
+  if(!result.llm_tags.length) delete result.llm_tags;
+
+  return result;
+}
+
+function renderExport(){
+  const opts=getExOpts();
+  const merchants=[];
+  if(opts.rhoback) merchants.push('rhoback');
+  if(opts.wyze) merchants.push('wyze');
+
+  if(!merchants.length){
+    document.getElementById('ex-summary').textContent='Select at least one merchant.';
+    document.getElementById('ex-outputs').innerHTML='';
+    return;
+  }
+
+  const container=document.getElementById('ex-outputs');
+  const parts=[];
+  if(opts.tactics) parts.push(V0_TACTICS.length+' tactic(s)');
+  if(opts.blueprints){
+    const ct=V0_BLUEPRINTS.filter(b=>merchants.includes(b.m)).length;
+    parts.push(ct+' blueprints');
+  }
+  if(opts.llm) parts.push(V0_NEW_LLM.length+' llm_tag(s)');
+  const merchLabel=merchants.join(' + ');
+  document.getElementById('ex-summary').textContent=parts.length?`${merchLabel}: ${parts.join(', ')}`:'Nothing selected.';
+
+  if(opts.mode==='single'){
+    const data=buildForMerchants(merchants,opts);
+    container.innerHTML=`
+      <div class="cd p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="font-bold text-sm text-white">${merchLabel}</span>
+          <span class="badge tm">${parts.join(' + ')}</span>
+          <button onclick="copyEl('json-single')" class="copy-btn ml-auto">Copy JSON</button>
+          <button onclick="downloadEl('json-single','${merchants.join('_')}_v0_seed.json')" class="copy-btn">Download</button>
+        </div>
+        <div class="json-out" id="json-single">${esc(JSON.stringify(data,null,2))}</div>
+      </div>`;
+  } else {
+    // Separate per merchant
+    container.innerHTML=merchants.map(m=>{
+      const data=buildForMerchants([m],opts);
+      const bpCount=data.blueprints?data.blueprints.length:0;
+      const subParts=[];
+      if(data.tactics) subParts.push(data.tactics.length+' tactic');
+      if(data.blueprints) subParts.push(bpCount+' blueprints');
+      if(data.llm_tags) subParts.push(data.llm_tags.length+' llm_tag(s)');
+      return `<div class="cd p-4">
+        <div class="flex items-center gap-3 mb-3">
+          <span class="font-bold text-sm text-white">${m.charAt(0).toUpperCase()+m.slice(1)}</span>
+          <span class="badge ${m==='rhoback'?'tp':'tg'}">${subParts.join(' + ')}</span>
+          <button onclick="copyEl('json-${m}')" class="copy-btn ml-auto">Copy JSON</button>
+          <button onclick="downloadEl('json-${m}','${m}_v0_seed.json')" class="copy-btn">Download</button>
+        </div>
+        <div class="json-out" id="json-${m}">${esc(JSON.stringify(data,null,2))}</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+function copyEl(id){
+  const el=document.getElementById(id);
+  navigator.clipboard.writeText(el.textContent).then(()=>{
+    const btn=el.parentElement.querySelector('.copy-btn');
+    const orig=btn.textContent;
+    btn.textContent='Copied!';btn.style.color='#10b981';btn.style.borderColor='#10b981';
+    setTimeout(()=>{btn.textContent=orig;btn.style.color='';btn.style.borderColor=''},1500);
+  });
+}
+
+function downloadEl(id,filename){
+  const el=document.getElementById(id);
+  const blob=new Blob([el.textContent],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=filename;a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ========== INPUTS DATA ==========
+const ENUM_MSG_TYPES=[
+  {value:"engagement",desc:"Build relationship and interaction"},
+  {value:"brand_inspiration",desc:"Share brand story and values"},
+  {value:"product_education",desc:"Teach about products"},
+  {value:"conversion",desc:"Drive immediate purchase"},
+  {value:"transactional",desc:"Post-purchase communication"}
+];
+const ENUM_TACTIC_GROUPS=[
+  {value:"advocacy",desc:"Referral and advocacy tactics"},
+  {value:"brand_story",desc:"Brand narrative content"},
+  {value:"discovery_question",desc:"Conversational discovery"},
+  {value:"education",desc:"Product education content"},
+  {value:"loyalty",desc:"Loyalty and retention tactics"},
+  {value:"nudge",desc:"Behavioral nudge tactics"},
+  {value:"offer",desc:"Discount and promotion tactics"},
+  {value:"post_purchase_care",desc:"After-sale support"},
+  {value:"social_proof",desc:"Social validation tactics"},
+  {value:"support",desc:"Customer support communication"}
+];
+const ENUM_LIFECYCLE=[
+  {value:"acquisition",desc:"Just discovered the brand"},
+  {value:"interest",desc:"Browsing and exploring"},
+  {value:"consideration",desc:"Comparing options"},
+  {value:"conversion",desc:"Ready to buy"},
+  {value:"post_purchase",desc:"Just bought"},
+  {value:"advocacy_loyalty",desc:"Active promoter"},
+  {value:"reactivation",desc:"Lapsed, needs re-engagement"}
+];
+const ENUM_CUSTOMER_STATES=[
+  {value:"prospective_customer",desc:"Opted in but no purchase"},
+  {value:"one_time_purchaser",desc:"Made one purchase"},
+  {value:"repeat_customer",desc:"Multiple purchases"}
+];
+const ENUM_LEVERS=[
+  {name:"Reciprocity",abbr:"recip",desc:"Give-to-get dynamic",mai:false},
+  {name:"Autonomy/Choice",abbr:"auton",desc:"Empowerment and self-selection",mai:false},
+  {name:"Social Proof",abbr:"socpr",desc:"Peer behavior and validation",mai:true},
+  {name:"Endowment Effect",abbr:"endow",desc:"Ownership and personalization",mai:false},
+  {name:"Commitment/Consistency",abbr:"commi",desc:"Follow-through on prior action",mai:false},
+  {name:"Anchoring",abbr:"ancho",desc:"Reference price/value framing",mai:false},
+  {name:"Goal Gradient",abbr:"goalg",desc:"Progress toward a goal",mai:false},
+  {name:"Loss Aversion",abbr:"lossa",desc:"Fear of missing out",mai:false},
+  {name:"Scarcity",abbr:"scarc",desc:"Limited availability framing",mai:false},
+  {name:"Temporal Discounting",abbr:"tempo",desc:"Now vs later framing",mai:false},
+  {name:"Status Quo Disruption",abbr:"statq",desc:"Challenge current behavior",mai:false},
+  {name:"Framing Effect",abbr:"frame",desc:"Perspective/context shift",mai:false},
+  {name:"personalization",abbr:"—",desc:"MAI LeverType: personalized content",mai:true},
+  {name:"engagement",abbr:"—",desc:"MAI LeverType: relationship building",mai:true},
+  {name:"offer",abbr:"—",desc:"MAI LeverType: discount/promo driven",mai:true}
+];
+const ENUM_SLIDERS=[
+  {name:"urgency",l1:"Low urgency, relaxed tone",l2:"Moderate urgency, balanced",l3:"High urgency, time-sensitive"},
+  {name:"discount_propensity",l1:"No discount, value-led",l2:"Soft discount, incentive-lite",l3:"Hard discount, promo-forward"},
+  {name:"conversational_propensity",l1:"Broadcast style, one-way",l2:"Semi-conversational",l3:"Fully conversational, dialogic"},
+  {name:"product_vs_brand",l1:"Brand-focused storytelling",l2:"Balanced brand + product",l3:"Product-focused, feature-led"},
+  {name:"offer_frequency",l1:"Rare offers, organic feel",l2:"Periodic offers",l3:"Frequent offers, deal-forward"}
+];
+
+// Parse "TacticGroup — Lever" description into parts
+function parseDesc(d){
+  const parts=d.split(' — ');
+  return {group:parts[0]||'',lever:parts[1]||''};
+}
+
+const HOOKS=[
+  {t:"Welcome to {brand_name}.",d:"Offer — Reciprocity"},{t:"Hey {subscriber_first_name}! So glad you're here.",d:"Offer — Reciprocity"},{t:"We saved something for you, {subscriber_first_name}.",d:"Offer — Reciprocity"},{t:"{subscriber_first_name}, we put something aside just for you.",d:"Offer — Reciprocity"},{t:"{brand_greeting} {subscriber_first_name}! [emotional_hook].",d:"Offer — Reciprocity"},{t:"[behavioral_hook], {subscriber_first_name} —",d:"Offer — Reciprocity"},
+  {t:"You just joined something special.",d:"Offer — Autonomy/Choice"},{t:"[behavioral_hook] — welcome.",d:"Offer — Autonomy/Choice"},
+  {t:"{subscriber_first_name}, you're going to want to see this.",d:"Offer — Social Proof"},{t:"{subscriber_first_name}, [engagement_observation].",d:"Offer — Social Proof"},
+  {t:"{subscriber_first_name}, this one has your name on it.",d:"Offer — Endowment Effect"},
+  {t:"Still thinking it over? Good things don't wait, {subscriber_first_name}.",d:"Offer — Commitment/Consistency"},{t:"{subscriber_first_name}, still browsing? Here's a nudge.",d:"Offer — Commitment/Consistency"},{t:"[behavioral_callback] — still thinking?",d:"Offer — Commitment/Consistency"},
+  {t:"{subscriber_first_name}, save {discount_framing} on what you love.",d:"Offer — Anchoring"},
+  {t:"One step from your first order, {subscriber_first_name}.",d:"Offer — Goal Gradient"},
+  {t:"{subscriber_first_name}, we held this for you but not for long.",d:"Offer — Loss Aversion"},{t:"{subscriber_first_name}, your welcome offer is fading fast.",d:"Offer — Loss Aversion"},{t:"{subscriber_first_name}, your exclusive offer is about to expire.",d:"Offer — Loss Aversion"},{t:"{subscriber_first_name}, still haven't used your welcome offer?",d:"Offer — Loss Aversion"},{t:"{subscriber_first_name}, [behavioral_callback] —",d:"Offer — Loss Aversion"},{t:"[behavioral_hook] — plus your offer is still here.",d:"Offer — Loss Aversion"},
+  {t:"Time's running out on your welcome offer, {subscriber_first_name}.",d:"Offer — Scarcity"},{t:"Clock's ticking, {subscriber_first_name} — your offer won't wait.",d:"Offer — Scarcity"},
+  {t:"{subscriber_first_name}, your code is live right now.",d:"Offer — Temporal Discounting"},
+  {t:"Last chance, {subscriber_first_name} — this deal won't come back.",d:"Offer — Status Quo Disruption"},
+  {t:"Fresh drop + your welcome offer? Yes please, {subscriber_first_name}.",d:"Offer — Framing Effect"},{t:"[behavioral_hook] — check out what just dropped.",d:"Offer — Framing Effect"},
+  {t:"{brand_greeting}, quick question for you.",d:"Discovery Question — Autonomy/Choice"},{t:"{brand_greeting}! One quick question to get you started.",d:"Discovery Question — Autonomy/Choice"},{t:"Quick — what catches your eye?",d:"Discovery Question — Autonomy/Choice"},{t:"Thanks for your order, {subscriber_first_name}! What would you explore next?",d:"Discovery Question — Autonomy/Choice"},{t:"Might surprise you this time, {subscriber_first_name} — want to explore?",d:"Discovery Question — Autonomy/Choice"},{t:"[behavioral_hook] — quick question.",d:"Discovery Question — Autonomy/Choice"},
+  {t:"Welcome! Help me help you, {subscriber_first_name}.",d:"Discovery Question — Commitment/Consistency"},{t:"{subscriber_first_name}, been thinking about what you might like.",d:"Discovery Question — Commitment/Consistency"},{t:"{subscriber_first_name}, I've got a few ideas for you.",d:"Discovery Question — Commitment/Consistency"},{t:"{subscriber_first_name}, now that you've tried us —",d:"Discovery Question — Commitment/Consistency"},{t:"{subscriber_first_name}, loved your last pick! Curious what's next.",d:"Discovery Question — Commitment/Consistency"},{t:"{subscriber_first_name}, you always have great taste.",d:"Discovery Question — Commitment/Consistency"},{t:"[engagement_observation], {subscriber_first_name}.",d:"Discovery Question — Commitment/Consistency"},{t:"[purchase_history_signal] — so here's a question.",d:"Discovery Question — Commitment/Consistency"},{t:"[preference_acknowledgment], {subscriber_first_name}.",d:"Discovery Question — Commitment/Consistency"},
+  {t:"{subscriber_first_name}, let me find your perfect match.",d:"Discovery Question — Goal Gradient"},{t:"{subscriber_first_name}, which direction are you leaning?",d:"Discovery Question — Goal Gradient"},{t:"{subscriber_first_name}, thinking about anything else?",d:"Discovery Question — Goal Gradient"},{t:"[engagement_observation] — let me help.",d:"Discovery Question — Goal Gradient"},
+  {t:"Something new just dropped and I want your take.",d:"Discovery Question — Status Quo Disruption"},{t:"It's been a minute, {subscriber_first_name}. What sounds good?",d:"Discovery Question — Status Quo Disruption"},{t:"Something new just dropped and I had to share, {subscriber_first_name}.",d:"Discovery Question — Status Quo Disruption"},{t:"{subscriber_first_name}, we dropped something new just for you.",d:"Discovery Question — Status Quo Disruption"},{t:"[behavioral_hook] — something new just dropped.",d:"Discovery Question — Status Quo Disruption"},
+  {t:"Ever wonder what makes this one different?",d:"Education — Social Proof"},{t:"Here's why everyone's talking about this one.",d:"Education — Social Proof"},{t:"[emotional_hook] — here's why.",d:"Education — Social Proof"},
+  {t:"Something just dropped that you need to see.",d:"Education — Autonomy/Choice"},
+  {t:"Thousands of people can't stop talking about this.",d:"Education — Anchoring"},{t:"The value in this one speaks for itself.",d:"Education — Anchoring"},{t:"Even after {purchase_count} orders, this might surprise you, {subscriber_first_name}.",d:"Education — Anchoring"},{t:"[social_proof_statement] — and for good reason.",d:"Education — Anchoring"},
+  {t:"Here's what the community is raving about.",d:"Education — Commitment/Consistency"},{t:"{subscriber_first_name}, picked this one for you.",d:"Education — Commitment/Consistency"},{t:"For someone with your taste, {subscriber_first_name} —",d:"Education — Commitment/Consistency"},{t:"{subscriber_first_name}, this one checks every box.",d:"Education — Commitment/Consistency"},{t:"[preference_acknowledgment] — this one's for you.",d:"Education — Commitment/Consistency"},{t:"[purchase_history_signal] — this one checks every box.",d:"Education — Commitment/Consistency"},
+  {t:"Selling fast — don't miss this one.",d:"Education — Scarcity"},{t:"Going fast — this one won't last, {subscriber_first_name}.",d:"Education — Scarcity"},{t:"VIP first look, {subscriber_first_name}.",d:"Education — Scarcity"},{t:"{subscriber_first_name}, early access — just for you.",d:"Education — Scarcity"},{t:"[preference_acknowledgment] — early access just for you.",d:"Education — Scarcity"},
+  {t:"{subscriber_first_name}, you'll regret passing on this.",d:"Education — Loss Aversion"},
+  {t:"A lot has changed since your last visit.",d:"Education — Status Quo Disruption"},{t:"We've upgraded since your last visit, {subscriber_first_name}.",d:"Education — Status Quo Disruption"},{t:"[behavioral_hook] — things have changed.",d:"Education — Status Quo Disruption"},
+  {t:"One feature away from your perfect fit, {subscriber_first_name}.",d:"Education — Goal Gradient"},
+  {t:"This one's made for you, {subscriber_first_name}.",d:"Education — Endowment Effect"},
+  {t:"{subscriber_first_name}, try this today.",d:"Education — Temporal Discounting"},{t:"{subscriber_first_name}, here's a pro tip.",d:"Education — Temporal Discounting"},
+  {t:"New and improved — take a look, {subscriber_first_name}.",d:"Education — Framing Effect"},
+  {t:"{subscriber_first_name}, it's official — your order is in!",d:"Post-Purchase Care — Endowment Effect"},{t:"{subscriber_first_name}, your order is confirmed!",d:"Post-Purchase Care — Endowment Effect"},{t:"{subscriber_first_name}, your latest addition is on its way.",d:"Post-Purchase Care — Endowment Effect"},{t:"{subscriber_first_name}, [celebration_message] — it's official.",d:"Post-Purchase Care — Endowment Effect"},
+  {t:"Great choice, {subscriber_first_name}.",d:"Post-Purchase Care — Commitment/Consistency"},{t:"Solid choice, {subscriber_first_name} — you're going to love it.",d:"Post-Purchase Care — Commitment/Consistency"},{t:"Another solid pick for the collection, {subscriber_first_name}.",d:"Post-Purchase Care — Commitment/Consistency"},{t:"{subscriber_first_name}, back for more — love to see it.",d:"Post-Purchase Care — Commitment/Consistency"},{t:"[purchase_history_signal] — another solid pick.",d:"Post-Purchase Care — Commitment/Consistency"},
+  {t:"{subscriber_first_name}, you just joined {customer_count} happy customers.",d:"Post-Purchase Care — Social Proof"},{t:"{subscriber_first_name}, your reviews help others find the right fit.",d:"Post-Purchase Care — Social Proof"},{t:"{subscriber_first_name}, your opinion helps the community.",d:"Post-Purchase Care — Social Proof"},{t:"{subscriber_first_name}, [social_proof_statement] — your voice matters.",d:"Post-Purchase Care — Social Proof"},
+  {t:"{subscriber_first_name}, it's on its way.",d:"Post-Purchase Care — Temporal Discounting"},
+  {t:"{subscriber_first_name}, we'd love to hear what you think.",d:"Post-Purchase Care — Reciprocity"},{t:"{subscriber_first_name}, how's everything treating you?",d:"Post-Purchase Care — Reciprocity"},{t:"{subscriber_first_name}, we'd love your take.",d:"Post-Purchase Care — Reciprocity"},{t:"[preference_acknowledgment] — VIP taste confirmed.",d:"Post-Purchase Care — Reciprocity"},
+  {t:"Great add to your collection, {subscriber_first_name}.",d:"Post-Purchase Care — Goal Gradient"}
+];
+
+const CTAS=[
+  {t:"Your welcome gift is inside:",d:"Offer — Reciprocity"},{t:"Start shopping with your welcome gift:",d:"Offer — Reciprocity"},{t:"Use your welcome offer:",d:"Offer — Reciprocity"},{t:"Claim your welcome offer:",d:"Offer — Reciprocity"},{t:"[cta]:",d:"Offer — Reciprocity"},
+  {t:"Browse whenever you're ready:",d:"Offer — Autonomy/Choice"},{t:"[cta_discovery]:",d:"Offer — Autonomy/Choice"},
+  {t:"See what others are loving:",d:"Offer — Social Proof"},{t:"[cta_social_proof]:",d:"Offer — Social Proof"},
+  {t:"Your discount is waiting:",d:"Offer — Endowment Effect"},
+  {t:"You've been looking — treat yourself:",d:"Offer — Commitment/Consistency"},{t:"Treat yourself — you deserve it:",d:"Offer — Commitment/Consistency"},
+  {t:"Save {discount_framing} on what you love:",d:"Offer — Anchoring"},
+  {t:"One step from your first order:",d:"Offer — Goal Gradient"},
+  {t:"Don't let your offer expire:",d:"Offer — Loss Aversion"},{t:"Use it before it's gone:",d:"Offer — Loss Aversion"},{t:"Your exclusive offer won't last:",d:"Offer — Loss Aversion"},{t:"Redeem before it disappears:",d:"Offer — Loss Aversion"},{t:"[cta_urgency]:",d:"Offer — Loss Aversion"},
+  {t:"Offer ends soon — shop now:",d:"Offer — Scarcity"},{t:"Shop before time runs out:",d:"Offer — Scarcity"},
+  {t:"Use your code right now:",d:"Offer — Temporal Discounting"},
+  {t:"Last chance before it's gone:",d:"Offer — Status Quo Disruption"},
+  {t:"New arrivals + your discount:",d:"Offer — Framing Effect"},
+  {t:"What are you most interested in?",d:"Discovery Question — Autonomy/Choice"},{t:"Tell me what you're into:",d:"Discovery Question — Autonomy/Choice"},{t:"What matters to you?",d:"Discovery Question — Autonomy/Choice"},{t:"What would you like to explore next?",d:"Discovery Question — Autonomy/Choice"},{t:"Might surprise you — want to explore?",d:"Discovery Question — Autonomy/Choice"},{t:"[cta_engagement]:",d:"Discovery Question — Autonomy/Choice"},
+  {t:"Tell me and I'll point you in the right direction",d:"Discovery Question — Commitment/Consistency"},{t:"Tell me what you're into and I'll find something you'll love",d:"Discovery Question — Commitment/Consistency"},{t:"Help me narrow it down:",d:"Discovery Question — Commitment/Consistency"},{t:"What else are you into?",d:"Discovery Question — Commitment/Consistency"},{t:"What else are you eyeing?",d:"Discovery Question — Commitment/Consistency"},{t:"What are you looking for this time?",d:"Discovery Question — Commitment/Consistency"},
+  {t:"Let me find your perfect match:",d:"Discovery Question — Goal Gradient"},{t:"Which direction are you leaning?",d:"Discovery Question — Goal Gradient"},{t:"Thinking about anything else?",d:"Discovery Question — Goal Gradient"},
+  {t:"What catches your eye?",d:"Discovery Question — Status Quo Disruption"},{t:"What sounds good?",d:"Discovery Question — Status Quo Disruption"},{t:"What's calling to you?",d:"Discovery Question — Status Quo Disruption"},
+  {t:"See why it's a favorite:",d:"Education — Social Proof"},{t:"See what the buzz is about:",d:"Education — Social Proof"},{t:"[cta_educational]:",d:"Education — Social Proof"},
+  {t:"Check it out for yourself:",d:"Education — Autonomy/Choice"},
+  {t:"See how much value you get:",d:"Education — Anchoring"},{t:"See how much you get:",d:"Education — Anchoring"},{t:"Even after {purchase_count} orders, this might surprise you:",d:"Education — Anchoring"},
+  {t:"Join others who solved this:",d:"Education — Commitment/Consistency"},{t:"You'll want to know about this:",d:"Education — Commitment/Consistency"},{t:"Next level — check this out:",d:"Education — Commitment/Consistency"},{t:"See why it's made for you:",d:"Education — Commitment/Consistency"},
+  {t:"Selling fast — grab yours:",d:"Education — Scarcity"},{t:"Grab yours before it's gone:",d:"Education — Scarcity"},{t:"VIP early access:",d:"Education — Scarcity"},{t:"Get first dibs:",d:"Education — Scarcity"},
+  {t:"Don't miss this:",d:"Education — Loss Aversion"},
+  {t:"See what's changed:",d:"Education — Status Quo Disruption"},{t:"We've upgraded since your last visit:",d:"Education — Status Quo Disruption"},
+  {t:"One feature away from your perfect fit:",d:"Education — Goal Gradient"},
+  {t:"This one's made for you:",d:"Education — Endowment Effect"},
+  {t:"Try this today:",d:"Education — Temporal Discounting"},{t:"Try this pro tip today:",d:"Education — Temporal Discounting"},
+  {t:"New and improved — take a look:",d:"Education — Framing Effect"},
+  {t:"Track your order:",d:"Post-Purchase Care — Endowment Effect"},{t:"Track your package:",d:"Post-Purchase Care — Endowment Effect"},{t:"Your latest addition:",d:"Post-Purchase Care — Endowment Effect"},
+  {t:"Great choice — here's what's next:",d:"Post-Purchase Care — Commitment/Consistency"},{t:"Here's what happens next:",d:"Post-Purchase Care — Commitment/Consistency"},{t:"Another great pick — tracking soon:",d:"Post-Purchase Care — Commitment/Consistency"},{t:"Your tracking info is ready:",d:"Post-Purchase Care — Commitment/Consistency"},
+  {t:"You just joined {customer_count} happy customers:",d:"Post-Purchase Care — Social Proof"},{t:"Your reviews help others find the right fit:",d:"Post-Purchase Care — Social Proof"},{t:"Leave a quick review:",d:"Post-Purchase Care — Social Proof"},
+  {t:"It's on its way:",d:"Post-Purchase Care — Temporal Discounting"},
+  {t:"We'd love to hear what you think:",d:"Post-Purchase Care — Reciprocity"},{t:"Share your honest take:",d:"Post-Purchase Care — Reciprocity"},{t:"We'd love your take:",d:"Post-Purchase Care — Reciprocity"},
+  {t:"Great add to your collection:",d:"Post-Purchase Care — Goal Gradient"}
+];
+
+// Render enums
+function renderEnums(){
+  document.getElementById('enum-msg-types').innerHTML=ENUM_MSG_TYPES.map(e=>`<tr><td class="font-mono text-xs text-white">${e.value}</td><td class="text-xs">${e.desc}</td></tr>`).join('');
+  document.getElementById('enum-tactic-groups').innerHTML=ENUM_TACTIC_GROUPS.map(e=>`<tr><td class="font-mono text-xs text-white">${e.value}</td><td class="text-xs">${e.desc}</td></tr>`).join('');
+  document.getElementById('enum-lifecycle').innerHTML=ENUM_LIFECYCLE.map(e=>`<tr><td class="font-mono text-xs text-white">${e.value}</td><td class="text-xs">${e.desc}</td></tr>`).join('');
+  document.getElementById('enum-customer-states').innerHTML=ENUM_CUSTOMER_STATES.map(e=>`<tr><td class="font-mono text-xs text-white">${e.value}</td><td class="text-xs">${e.desc}</td></tr>`).join('');
+  document.getElementById('enum-levers').innerHTML=ENUM_LEVERS.map(e=>`<tr><td class="text-xs text-white">${e.name}</td><td class="font-mono text-xs text-gh">${e.abbr}</td><td class="text-xs">${e.desc}</td><td class="text-center">${e.mai?'<span class="badge tp">YES</span>':'<span class="text-gh/30">—</span>'}</td></tr>`).join('');
+  document.getElementById('enum-sliders').innerHTML=ENUM_SLIDERS.map(e=>`<tr><td class="font-mono text-xs text-white">${e.name}</td><td class="text-[11px] text-gh">${e.l1}</td><td class="text-[11px] text-gh">${e.l2}</td><td class="text-[11px] text-gh">${e.l3}</td></tr>`).join('');
+}
+
+// Hooks filtering
+let hFG='all',hFL='all';
+function filterHooks(type,val){
+  if(type==='group'){hFG=val;document.querySelectorAll('[data-hg]').forEach(b=>b.classList.toggle('on',b.dataset.hg===val))}
+  if(type==='lever'){hFL=val;document.querySelectorAll('[data-hl]').forEach(b=>b.classList.toggle('on',b.dataset.hl===val))}
+  renderHooks();
+}
+function renderHooks(){
+  const groupColors={Offer:'tm','Discovery Question':'tl',Education:'tp','Post-Purchase Care':'tn'};
+  const f=HOOKS.filter(h=>{
+    const p=parseDesc(h.d);
+    if(hFG!=='all'&&p.group!==hFG) return false;
+    if(hFL!=='all'&&!p.lever.includes(hFL)) return false;
+    return true;
+  });
+  document.getElementById('hooks-count').textContent=f.length+' hooks';
+  document.getElementById('hooks-body').innerHTML=f.map((h,i)=>{
+    const p=parseDesc(h.d);
+    return `<tr>
+      <td class="font-mono text-xs text-gh/50">${i+1}</td>
+      <td class="text-xs text-white">${esc(h.t).replace(/\{(\w+)\}/g,'<span class="hm">{$1}</span>').replace(/\[(\w+)\]/g,'<span class="hl">[$1]</span>')}</td>
+      <td><span class="badge ${groupColors[p.group]||'tn'}">${p.group}</span></td>
+      <td class="text-xs">${p.lever}</td>
+    </tr>`;
+  }).join('');
+}
+
+// CTAs filtering
+let cFG='all',cFL='all';
+function filterCTAs(type,val){
+  if(type==='group'){cFG=val;document.querySelectorAll('[data-cg]').forEach(b=>b.classList.toggle('on',b.dataset.cg===val))}
+  if(type==='lever'){cFL=val;document.querySelectorAll('[data-cl]').forEach(b=>b.classList.toggle('on',b.dataset.cl===val))}
+  renderCTAs();
+}
+function renderCTAs(){
+  const groupColors={Offer:'tm','Discovery Question':'tl',Education:'tp','Post-Purchase Care':'tn'};
+  const f=CTAS.filter(c=>{
+    const p=parseDesc(c.d);
+    if(cFG!=='all'&&p.group!==cFG) return false;
+    if(cFL!=='all'&&!p.lever.includes(cFL)) return false;
+    return true;
+  });
+  document.getElementById('ctas-count').textContent=f.length+' CTAs';
+  document.getElementById('ctas-body').innerHTML=f.map((c,i)=>{
+    const p=parseDesc(c.d);
+    return `<tr>
+      <td class="font-mono text-xs text-gh/50">${i+1}</td>
+      <td class="text-xs text-white">${esc(c.t).replace(/\{(\w+)\}/g,'<span class="hm">{$1}</span>').replace(/\[(\w+)\]/g,'<span class="hl">[$1]</span>')}</td>
+      <td><span class="badge ${groupColors[p.group]||'tn'}">${p.group}</span></td>
+      <td class="text-xs">${p.lever}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ========== INIT ==========
+document.addEventListener('DOMContentLoaded',()=>{
+  renderToday();renderV0();renderEnums();renderHooks();renderCTAs();
+  nav('today-tactics');
+});
+</script>
+</body>
+</html>
