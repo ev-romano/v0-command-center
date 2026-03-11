@@ -105,8 +105,9 @@ textarea:focus{outline:none;border-color:var(--ac)}
     <button onclick="nav('inputs-enums')" data-p="inputs-enums" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Enums & Taxonomy</button>
     <button onclick="nav('inputs-hooks')" data-p="inputs-hooks" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Hooks (99)</button>
     <button onclick="nav('inputs-ctas')" data-p="inputs-ctas" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">CTAs (80)</button>
-    <div class="font-mono text-[9px] text-gh/50 px-2 pt-3 pb-1 tracking-widest">EXPORT</div>
+    <div class="font-mono text-[9px] text-gh/50 px-2 pt-3 pb-1 tracking-widest">DELIVERY</div>
     <button onclick="nav('export')" data-p="export" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Generate JSON</button>
+    <button onclick="nav('questions')" data-p="questions" class="nav-item w-full text-left px-2.5 py-2 rounded text-xs border-l-2 border-transparent">Open Questions</button>
   </div>
   <div class="p-2.5 border-t border-s3 flex items-center justify-between">
     <div class="font-mono text-[9px] text-gh/40">marketing-ai</div>
@@ -393,6 +394,17 @@ textarea:focus{outline:none;border-color:var(--ac)}
   <div id="ex-outputs" class="space-y-4"></div>
 </div>
 
+<!-- ============ OPEN QUESTIONS ============ -->
+<div id="page-questions" class="page p-5 fade">
+  <div class="flex items-center gap-3 mb-4">
+    <h1 class="font-bold text-lg text-white">Open Questions</h1>
+    <span class="badge tg">NEEDS DECISION</span>
+    <span class="font-mono text-xs text-gh ml-auto" id="q-count"></span>
+  </div>
+
+  <div class="space-y-4" id="q-list"></div>
+</div>
+
 </main>
 
 <script>
@@ -601,12 +613,12 @@ const V0_BLUEPRINTS=[
    mt:["brand_name","abandoned_checkout_url"],lt:[],u:1,d:1,c:4,b:3,lv:["engagement"]},
   {m:"wyze",stage:"conversion",slot:1,pid:15,tactic:"urgency_question",strategy:"Cart urgency",
    orig:"Hey {{subscriber.first_name}} it's Jerry from {{shop.name}}. Quick Q for ya: you're not planning on forgetting about that cool tech in your cart, right? It's available now, and I don't want you to miss out on this chance.\n\nTake 10 seconds to wrap it up here: [cart_link]",
-   tmpl:"Hey {{subscriber_first_name}} it's {{brand_persona_name}} from {{brand_name}}. Quick Q for ya: you're not planning on forgetting about that cool tech in your cart, right? It's available now, and I don't want you to miss out on this chance.\n\nTake 10 seconds to wrap it up here: {{abandoned_checkout_url}}",
-   mt:["subscriber_first_name","brand_persona_name","brand_name","abandoned_checkout_url"],lt:[],u:4,d:1,c:5,b:2,lv:["personalization","engagement"]},
+   tmpl:"Hey! It's {{brand_persona_name}} from {{brand_name}}. Quick Q for ya: you're not planning on forgetting about that cool tech in your cart, right? It's available now, and I don't want you to miss out on this chance.\n\nTake 10 seconds to wrap it up here: {{abandoned_checkout_url}}",
+   mt:["brand_persona_name","brand_name","abandoned_checkout_url"],lt:[],u:4,d:1,c:5,b:2,lv:["personalization","engagement"]},
   {m:"wyze",stage:"conversion",slot:2,pid:16,tactic:"product_competition",strategy:"Demand scarcity",
    orig:"Hey {{subscriber.first_name}}, this is Jerry from Wyze. I wanted to give you a quick heads-up: we're experiencing high demand for our [product_in_cart_colloquial_name]. If you're ready to join the millions of satisfied Wyze users, it's best to act soon. Your link is waiting: [cart_link]",
-   tmpl:"Hey {{subscriber_first_name}}, this is {{brand_persona_name}} from {{brand_name}}. I wanted to give you a quick heads-up: we're experiencing high demand for the [[product_in_cart_colloquial_name]]. If you're ready to join the millions of satisfied {{brand_name}} users, it's best to act soon. Your link is waiting: {{abandoned_checkout_url}}",
-   mt:["subscriber_first_name","brand_persona_name","brand_name","abandoned_checkout_url"],lt:["product_in_cart_colloquial_name"],u:4,d:1,c:4,b:3,lv:["social_proof","personalization"]},
+   tmpl:"Hey, this is {{brand_persona_name}} from {{brand_name}}. I wanted to give you a quick heads-up: we're experiencing high demand for the [[product_in_cart_colloquial_name]]. If you're ready to join the millions of satisfied {{brand_name}} users, it's best to act soon. Your link is waiting: {{abandoned_checkout_url}}",
+   mt:["brand_persona_name","brand_name","abandoned_checkout_url"],lt:["product_in_cart_colloquial_name"],u:4,d:1,c:4,b:3,lv:["social_proof","personalization"]},
   {m:"wyze",stage:"conversion",slot:3,pid:17,tactic:"conversation_followup",strategy:"No-oriented question",
    orig:"Hey, it's Jerry again. Did you decide against that [product_in_cart_colloquial_category]? Let us know if you still want it set aside, or if you're looking for something different.\n\n[cart_link]",
    tmpl:"Hey, it's {{brand_persona_name}} again. Did you decide against that [[product_in_cart_colloquial_category]]? Let us know if you still want it set aside, or if you're looking for something different.\n\n{{abandoned_checkout_url}}",
@@ -625,6 +637,7 @@ function nav(p){
   el.classList.add('active');
   document.querySelector(`[data-p="${p}"]`).classList.add('active');
   if(p==='export') renderExport();
+  if(p==='questions') renderQuestions();
 }
 
 function hl(t){return t.replace(/\{\{(\w+)\}\}/g,'<span class="hm">{{$1}}</span>').replace(/\[\[(\w+)\]\]/g,'<span class="hl">[[$1]]</span>').replace(/\n/g,'<br>')}
@@ -1158,6 +1171,77 @@ function renderCTAs(){
     </tr>`;
   }).join('');
 }
+
+// ========== OPEN QUESTIONS ==========
+const V0_QUESTIONS=[
+  {id:"q1",status:"open",severity:"blocker",
+   title:"MAI subscriber-level property resolution for v0",
+   context:"MAI's PropertyContext currently only resolves 3 shop-level fields (brand_name, brand_guidelines, brand_target_customer_description). Subscriber-level properties like previously_issued_offer_code, previously_issued_offer_amount, and subscriber_first_name are registered but return None. This is documented as future work (v8 Epic 02).",
+   question:"Is subscriber-level property resolution wired and functional for v0 launch? Specifically: previously_issued_offer_code, previously_issued_offer_amount, abandoned_checkout_url.",
+   options:["Already wired for v0 — no action needed","Needs MAI work before v0 launch","Use fallback/hardcoded values for v0"],
+   owner:"Chase",tags:["MAI","merge-tags","blocker"]},
+  {id:"q2",status:"open",severity:"high",
+   title:"previously_issued_offer_amount format contract",
+   context:"Templates use the pattern: \"Your {{previously_issued_offer_amount}} off at {{brand_name}}\". If the resolved value includes the word \"off\" (e.g. \"15% off\"), the message reads \"Your 15% off off at Rhoback\" — double \"off\". The LLM tag new_offer_amount examples include \"15% off\" and \"$10 off\", but the merge tag version must be bare.",
+   question:"What format will previously_issued_offer_amount resolve to? Must be bare amount (\"15%\", \"$10\") without trailing \"off\".",
+   options:["Bare amount only (15%, $10) — no suffix","Amount with suffix (15% off) — templates need updating"],
+   owner:"Chase",tags:["merge-tags","format-contract"]},
+  {id:"q3",status:"open",severity:"high",
+   title:"Offer code existence guarantee at interest stage",
+   context:"12 blueprints reference {{previously_issued_offer_code}}, including interest-stage messages (the very first messages after opt-in). This assumes a welcome flow already issued a discount code before these messages fire. If no code was issued, messages read: \"remember to use at checkout\" — broken.",
+   question:"Is there a guarantee that a discount code is always issued at acquisition (before interest-stage messages)? Or do we need eligibility conditions?",
+   options:["Yes — welcome flow always issues a code first","No — need eligibility condition: previously_issued_offer_code EXISTS","Offer codes are generated in-flight by these templates (not pre-issued)"],
+   owner:"Chase / Evan",tags:["merge-tags","eligibility","data-flow"]},
+  {id:"q4",status:"open",severity:"medium",
+   title:"shop_url merge tag wiring",
+   context:"5 Wyze blueprints use {{shop_url}} as a general CTA link (interest + consideration stages where no product-specific URL exists). MAI has shop.link in its merge tag registry, but the mapping to shop_url property key needs to be confirmed.",
+   question:"Will shop_url be available as a resolved merge tag for v0? What's the mapping path?",
+   options:["Maps to shop.link — already wired","Needs new property key registration","Use bestsellers_collection_url as fallback"],
+   owner:"Chase",tags:["merge-tags","MAI","gap"]},
+  {id:"q5",status:"open",severity:"medium",
+   title:"bestsellers_collection_url data source",
+   context:"1 Rhoback blueprint (interest/1) uses {{bestsellers_collection_url}} as a CTA destination. The API doesn't have a standardized merge tag for collection URLs. This likely comes from Brand Center configuration.",
+   question:"Where does bestsellers_collection_url get populated from? Is it a Brand Center field, agent instructions, or something else?",
+   options:["Brand Center config field — merchant sets it up","Agent instructions — populated from shop data","Needs new field in Brand Center"],
+   owner:"Chase",tags:["merge-tags","Brand Center","config"]}
+];
+
+function renderQuestions(){
+  const qs=V0_QUESTIONS;
+  const open=qs.filter(q=>q.status==='open').length;
+  const resolved=qs.filter(q=>q.status==='resolved').length;
+  document.getElementById('q-count').textContent=`${open} open · ${resolved} resolved`;
+
+  document.getElementById('q-list').innerHTML=qs.map(q=>{
+    const sevColor=q.severity==='blocker'?'r':q.severity==='high'?'tg-fg':q.severity==='medium'?'tm-fg':'fg3';
+    const sevBg=q.severity==='blocker'?'background:rgba(239,68,68,.12);color:#f87171;border-color:rgba(239,68,68,.2)':
+                q.severity==='high'?'background:var(--tg-bg);color:var(--tg-fg);border-color:var(--tg-bd)':
+                'background:var(--tm-bg);color:var(--tm-fg);border-color:var(--tm-bd)';
+    const statusBadge=q.status==='resolved'?'<span class="badge tp">RESOLVED</span>':'<span class="badge" style="'+sevBg+'">'+q.severity.toUpperCase()+'</span>';
+    const savedKey='v0q-'+q.id;
+    const saved=localStorage.getItem(savedKey);
+    return `<div class="cd p-4" id="qcard-${q.id}">
+      <div class="flex items-center gap-2 mb-2">
+        ${statusBadge}
+        <span class="font-bold text-sm text-white">${q.title}</span>
+        <span class="font-mono text-[10px] text-gh ml-auto">${q.owner}</span>
+      </div>
+      <div class="text-xs text-gray-400 mb-3 leading-relaxed">${q.context}</div>
+      <div class="text-xs font-medium text-white mb-2">${q.question}</div>
+      <div class="space-y-1.5 mb-3">${q.options.map((o,i)=>`
+        <label class="flex items-center gap-2 text-xs cursor-pointer">
+          <input type="radio" name="${q.id}" value="${i}" ${saved==String(i)?'checked':''} onchange="saveAnswer('${q.id}',${i})" class="accent-cyan-500">
+          <span class="text-gray-300">${o}</span>
+        </label>`).join('')}</div>
+      <div class="flex items-center gap-2">
+        <div class="flex gap-1">${q.tags.map(t=>'<span class="badge tn">'+t+'</span>').join('')}</div>
+        <textarea id="notes-${q.id}" rows="1" placeholder="Notes..." onchange="saveNote('${q.id}')" class="ml-auto max-w-xs">${localStorage.getItem('v0qn-'+q.id)||''}</textarea>
+      </div>
+    </div>`;
+  }).join('');
+}
+function saveAnswer(id,idx){localStorage.setItem('v0q-'+id,idx)}
+function saveNote(id){localStorage.setItem('v0qn-'+id,document.getElementById('notes-'+id).value)}
 
 // ========== INIT ==========
 document.addEventListener('DOMContentLoaded',()=>{
