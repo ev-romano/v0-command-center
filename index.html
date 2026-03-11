@@ -212,7 +212,7 @@ textarea:focus{outline:none;border-color:var(--ac)}
     </div>
   </div>
   <div class="cd overflow-auto" style="max-height:calc(100vh - 100px)"><table>
-    <thead><tr><th>merchant</th><th>stage</th><th>slot</th><th>tactic</th><th>template_text (templatized)</th><th>original (CSV)</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th><th>merge_tags</th><th>llm_tags</th></tr></thead>
+    <thead><tr><th>id</th><th>merchant</th><th>stage</th><th>slot</th><th>tactic</th><th>template_text (templatized)</th><th>original (CSV)</th><th>urg</th><th>disc</th><th>conv</th><th>brand</th><th>levers</th><th>merge_tags</th><th>llm_tags</th></tr></thead>
     <tbody id="v0-bp-body"></tbody>
   </table></div>
 </div>
@@ -740,7 +740,13 @@ function renderBPTable(){
   const mc={rhoback:'bg-emerald-500/8 text-emerald-400',wyze:'bg-yellow-500/8 text-yellow-400'};
   const stc={interest:'bg-cyan-500/10 text-cyan-400',consideration:'bg-purple-500/10 text-purple-400',conversion:'bg-amber-500/10 text-amber-400'};
   const f=V0_BLUEPRINTS.filter(b=>(fM==='all'||b.m===fM)&&(fS==='all'||b.stage===fS));
-  document.getElementById('v0-bp-body').innerHTML=f.map(b=>`<tr class="${sc[b.stage]||''}">
+  document.getElementById('v0-bp-body').innerHTML=f.map(b=>{
+    const bpKey=`${b.m}-${b.stage}-${b.slot}`;
+    const bpIds=DELIVERED_BP_IDS[bpKey];
+    const shortId=bpIds?bpIds.id.split('-')[0]+'…':'—';
+    const fullId=bpIds?bpIds.id:'not pinned';
+    return `<tr class="${sc[b.stage]||''}">
+    <td class="font-mono text-[10px] text-gh whitespace-nowrap cursor-help" title="${fullId}">${shortId}</td>
     <td><span class="badge ${mc[b.m]||''}">${b.m}</span></td>
     <td><span class="badge ${stc[b.stage]||''}">${b.stage}</span></td>
     <td class="font-mono text-center">${b.slot}</td>
@@ -754,7 +760,7 @@ function renderBPTable(){
     <td>${badges(b.lv,'tl')}</td>
     <td>${b.mt.map(x=>`<span class="badge tm">${x}</span>`).join(' ')}</td>
     <td>${b.lt.map(x=>`<span class="badge tl">${x}</span>`).join(' ')||'<span class="text-gh/30">—</span>'}</td>
-  </tr>`).join('');
+  </tr>`}).join('');
 }
 
 // ========== EXPORT ==========
@@ -819,7 +825,22 @@ const DELIVERED_BP_IDS={
   "rhoback-conversion-1":{id:"25d8cd65-b7bb-4afb-bd90-5c2a502d380b",vgId:"59515b98-d92c-4d8b-9579-f489aa8971fe"},
   "rhoback-conversion-2":{id:"f96d0787-e9c1-4704-8a81-c73cdec50fb5",vgId:"bde917c8-ab90-4786-8a97-4c643d43e139"},
   "rhoback-conversion-3":{id:"445b40a3-a808-4083-89a1-2b7a4de442be",vgId:"e21d6be4-28d2-44c8-bfac-859b99c98b21"},
-  "rhoback-conversion-4":{id:"dee5aff0-04b4-4e42-955c-20f599b049a6",vgId:"899214ae-2a67-49ef-9510-ab6a2f0e7b3f"}
+  "rhoback-conversion-4":{id:"dee5aff0-04b4-4e42-955c-20f599b049a6",vgId:"899214ae-2a67-49ef-9510-ab6a2f0e7b3f"},
+  "wyze-interest-0":{id:"08258e42-0d43-4076-946d-c53b1a27c548",vgId:"d629b373-17e7-4732-aced-d651cd53fd9b"},
+  "wyze-interest-1":{id:"6155ed76-a918-4869-bbae-30b7f7b6ce2a",vgId:"6a243b23-fdc6-4a5e-adca-45e84bdc18cc"},
+  "wyze-interest-2":{id:"4b33e196-f10b-4fd0-bd7a-a3389c2ac21c",vgId:"c476b719-a4b1-447e-88f0-2bea2cb464c2"},
+  "wyze-interest-3":{id:"25516ad8-5b0b-4f0d-85fb-ebd8bae808a3",vgId:"aadcb68c-bd78-4676-bc12-aeb8c3accd49"},
+  "wyze-interest-4":{id:"cbaab522-af9e-4e7f-a1f2-bf1e5041df95",vgId:"5a2cbe1c-a898-4372-bbed-f544b377aa04"},
+  "wyze-consideration-0":{id:"3a69f28a-fe77-42ca-b42f-4b86960bae08",vgId:"cebed206-bfb3-47be-882d-a8264bee24e1"},
+  "wyze-consideration-1":{id:"5475dea1-21dd-4af9-a298-6d35543643a3",vgId:"49f99178-77a2-4c71-9d16-fa1e15216df4"},
+  "wyze-consideration-2":{id:"0c9c8d0c-37c7-458f-a02f-1947a94fdc1e",vgId:"38d0bfa3-3486-44d3-aad6-db5432c660dc"},
+  "wyze-consideration-3":{id:"dc7e1b8e-44c1-4780-97ac-68a37eae20c5",vgId:"a13a674c-5e70-4b31-86cb-013a5619b49d"},
+  "wyze-consideration-4":{id:"e0949d77-648d-49ad-82da-fc38e7bebfa5",vgId:"d44fc4c5-be05-4759-9c79-923c362fdd6c"},
+  "wyze-conversion-0":{id:"4c0b9f5e-867c-4825-bade-9c6d7900c2cb",vgId:"2f0d8d9e-29d2-4090-bff0-68229b3a21c7"},
+  "wyze-conversion-1":{id:"fc08acd6-7017-4488-9dfe-03e4fa7097d8",vgId:"af3f75aa-dec3-4ec0-b114-7b73072c4a5b"},
+  "wyze-conversion-2":{id:"0dee5910-23ea-4d99-bd30-4062aacae216",vgId:"224e8f4f-03e0-410c-93cd-677dc9bd3c49"},
+  "wyze-conversion-3":{id:"70288652-51be-470f-88d6-2f8bafdc7f7a",vgId:"d883ba05-3e35-472f-9b9d-c08b17e74f13"},
+  "wyze-conversion-4":{id:"99e0ef20-7513-4c30-ae75-e40ab8c1847a",vgId:"3d497982-73d9-43bb-bb59-06f1b6dce66c"}
 };
 
 // Fallback UUID generator for Wyze blueprints (not yet delivered)
