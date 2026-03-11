@@ -914,19 +914,31 @@ function buildForMerchants(merchants,opts){
 
   if(opts.blueprints){
     const filtered=V0_BLUEPRINTS.filter(b=>merchants.includes(b.m));
+    // Build tactic lookup for customer_states
+    const tacticMap={};V0_TACTICS.forEach(t=>{tacticMap[t.name]=t});
     result.blueprints=filtered.map(b=>{
       const bpKey=`${b.m}-${b.stage}-${b.slot}`;
       const bpIds=DELIVERED_BP_IDS[bpKey]||{id:uuid(`bp-${bpKey}`),vgId:uuid(`bp-vg-${bpKey}`)};
       const tacticRef=DELIVERED_TACTIC_IDS[b.tactic];
       const tid=tacticRef?tacticRef.id:uuid(`tactic-${b.tactic}`);
+      const tactic=tacticMap[b.tactic];
       return {
         id:bpIds.id,
         version_group_id:bpIds.vgId,
         tactic_id:tid,
-        parent_id:b.pid,
         template_text:b.tmpl,
         eligibility:[],
-        metadata:{urgency:b.u,discount:b.d,conversational:b.c,brand_focus:b.b,levers:b.lv}
+        metadata:{
+          urgency:b.u,
+          discount:b.d,
+          conversational:b.c,
+          brand_focus:b.b,
+          lifecycle_stages:[b.stage],
+          customer_states:tactic?tactic.customer_states:["prospective_customer"],
+          levers:b.lv,
+          parent_id:String(b.pid),
+          full_reference_text:b.orig
+        }
       };
     });
   } else { result.blueprints=[]; }
