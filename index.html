@@ -767,10 +767,9 @@ function renderBPTable(){
   document.getElementById('v0-bp-body').innerHTML=f.map(b=>{
     const bpKey=`${b.m}-${b.stage}-${b.slot}`;
     const bpIds=DELIVERED_BP_IDS[bpKey];
-    const shortId=bpIds?bpIds.id.split('-')[0]+'…':'—';
-    const fullId=bpIds?bpIds.id:'not pinned';
+    const fullId=bpIds?bpIds.id:'—';
     return `<tr class="${sc[b.stage]||''}">
-    <td class="font-mono text-[10px] text-gh whitespace-nowrap cursor-help" title="${fullId}">${shortId}</td>
+    <td class="font-mono text-[11px] text-gh whitespace-nowrap cursor-pointer select-all" style="min-width:290px" onclick="navigator.clipboard.writeText('${fullId}');this.style.color='#22c55e';setTimeout(()=>this.style.color='',600)">${fullId}</td>
     <td class="font-mono text-center text-xs">${b.pid}</td>
     <td><span class="badge ${mc[b.m]||''}">${b.m}</span></td>
     <td><span class="badge ${stc[b.stage]||''}">${b.stage}</span></td>
